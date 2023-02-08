@@ -21,6 +21,7 @@ import java.util.List;
 @Controller
 @RequestMapping("/api/township")
 public class TownshipController {
+
     @Autowired
     CityService cityService;
     @Autowired
@@ -28,27 +29,21 @@ public class TownshipController {
 
     @GetMapping("/")
     public String showList(Model model) {
+
         model.addAttribute("township", new TownshipModel());
         return getByPage(model, null, null,1, 5);
-    }
 
-    @PostMapping("/add")
-    public String add(@Valid @ModelAttribute("township") TownshipModel townshipModel, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
-        if(!result.hasErrors()) {
-            townshipService.save(townshipModel);
-            redirectAttributes.addFlashAttribute("added_success", true);
-            return "redirect:/api/township/";
-        }
-        return getByPage(model, null, null, 1, 5);
     }
 
     @GetMapping("/page")
     public String getPaginated(Model model, @RequestParam(required = false) String cityName, @RequestParam(required = false) String keyword, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "5") int size) {
+
         model.addAttribute("township", new TownshipModel());
         return getByPage(model, cityName, keyword, page, size);
     }
 
     public String getByPage(Model model, String cityName, String keyword, int page, int size) {
+
         Pageable paging = PageRequest.of(page - 1, size);
         Page<Township> townshipPage;
         boolean isEmptyKeyword = (keyword == null || keyword.equalsIgnoreCase(""));
@@ -80,5 +75,41 @@ public class TownshipController {
         model.addAttribute("totalPages", townshipPage.getTotalPages());
         model.addAttribute("pageSize", size);
         return "township_list";
+
     }
+
+    @PostMapping("/add")
+    public String add(@Valid @ModelAttribute("township") TownshipModel townshipModel, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
+
+        if(!result.hasErrors()) {
+            townshipService.saveOrUpdate(townshipModel);
+            redirectAttributes.addFlashAttribute("added_success", true);
+            return "redirect:/api/township/";
+        }
+        return getByPage(model, null, null, 1, 5);
+
+    }
+
+    @PostMapping("/update/{id}")
+    public String update(@PathVariable("id") long id, @Valid @ModelAttribute TownshipModel townshipModel, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
+
+        if(!result.hasErrors()) {
+            townshipModel.setId(id);
+            townshipService.saveOrUpdate(townshipModel);
+            redirectAttributes.addFlashAttribute("updated_success", true);
+            return "redirect:/api/township/";
+        }
+        return getByPage(model, null, null,1, 5);
+
+    }
+
+    @GetMapping("/delete/{id}")
+    public String delete(@PathVariable("id") long id, RedirectAttributes redirectAttributes) {
+
+        townshipService.deleteById(id);
+        redirectAttributes.addFlashAttribute("deleted_success", true);
+        return "redirect:/api/township/";
+
+    }
+
 }

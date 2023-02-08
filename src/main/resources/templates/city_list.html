@@ -98,8 +98,12 @@
     <!-- ======= Footer ======= -->
     <footer id="footer" class="footer">
     </footer><!-- End Footer -->
+
     <script th:inline="javascript">
+
         $(document).ready(function() {
+
+            <!-- Success Alert Boxes -->
             if([[${added_success}]]) {
                 iziToast.success({
                     message: 'Successfully Added!',
@@ -122,16 +126,43 @@
                     position: 'topCenter'
                 });
             }
+            <!-- End -->
 
+            <!-- When add button is clicked -->
+            $(".btn-add").click(function(event) {
+                event.preventDefault();
+                $.confirm({
+                    title: 'Confirm!',
+                    content: 'Are you sure to add?',
+                    type: 'green',
+                    autoClose: 'no|10000',
+                    buttons: {
+                        yes: {
+                            btnClass: 'btn-success',
+                            action: function () {
+                                $("#submitForm").prop("action", "/api/city/add");
+                                $("#submitForm").submit();
+                            }
+                        },
+                        no: function () {}
+                    }
+                });
+            });
+            <!-- End -->
+
+            <!-- When edit button is clicked -->
             $(document).delegate(".btn-edit", "click", function() {
                 var parent = $(this).parent().parent().parent();
                 var id = parent.children("td:nth-child(1)").html();
                 var cityName = parent.children("td:nth-child(3)").html();
+
                 $("#city-name").val(cityName);
                 $(".btn-update").prop("disabled", false);
                 $(".btn-update").append("<span hidden>" + id + "</span>");
             });
+            <!-- End -->
 
+            <!-- When update button is clicked -->
             $(".btn-update").click(function() {
                 event.preventDefault();
                 $.confirm({
@@ -148,37 +179,20 @@
                                 $("#submitForm").submit();
                             }
                         },
-                        no: function () {
-                        }
+                        no: function () {}
                     }
                 });
             });
+            <!-- End -->
 
-            $(".btn-add").click(function(event) {
-                event.preventDefault();
-                $.confirm({
-                    title: 'Confirm!',
-                    content: 'Are you sure to add?',
-                    type: 'green',
-                    autoClose: 'no|10000',
-                    buttons: {
-                        yes: {
-                            btnClass: 'btn-success',
-                            action: function () {
-                                $("#submitForm").prop("action", "/api/city/add");
-                                $("#submitForm").submit();
-                            }
-                        },
-                        no: function () {
-                        }
-                    }
-                });
-            });
 
+
+            <!-- When delete button is clicked -->
             $(document).delegate(".btn-delete", "click", function() {
                 event.preventDefault();
                 var parent = $(this).parent().parent().parent();
                 var id = parent.children("td:nth-child(1)").html();
+
                 $.confirm({
                     title: 'Confirm!',
                     content: "Are you sure to delete? <br><br><b class='text-danger'>If you delete this city, all townships included in this city will be removed as well!</b>",
@@ -191,16 +205,19 @@
                                 window.location = "/api/city/delete/" + id;
                             }
                         },
-                        no: function () {
-                        }
+                        no: function () {}
                     }
                 });
             });
+            <!-- End -->
 
+            <!-- When clear button is clicked -->
             $("#btnClear").on("click", function(e) {
               e.preventDefault();
               window.location = "/api/city/";
             });
+            <!-- End -->
+
         });
 
     </script>

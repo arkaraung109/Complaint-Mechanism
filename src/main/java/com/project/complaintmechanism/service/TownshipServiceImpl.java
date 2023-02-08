@@ -12,11 +12,11 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class TownshipServiceImpl implements TownshipService {
+
     @Autowired
     CityRepository cityRepository;
     @Autowired
     TownshipRepository townshipRepository;
-
 
     @Override
     public boolean existsByName(String s) {
@@ -44,7 +44,7 @@ public class TownshipServiceImpl implements TownshipService {
     }
 
     @Override
-    public void save(TownshipModel townshipModel) {
+    public void saveOrUpdate(TownshipModel townshipModel) {
         City city = City.builder()
                         .id(cityRepository.findByName(townshipModel.getCityName()).getId())
                         .name(townshipModel.getCityName())
@@ -57,4 +57,10 @@ public class TownshipServiceImpl implements TownshipService {
                                     .build();
         townshipRepository.save(township);
     }
+
+    @Override
+    public void deleteById(long id) {
+        townshipRepository.deleteById(id);
+    }
+
 }

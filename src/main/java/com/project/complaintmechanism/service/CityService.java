@@ -8,16 +8,17 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface CityService {
+
+    boolean existsByName(String s);
+
     List<City> findAll();
-    void save(CityModel cityModel);
-    Boolean existsByName(String s);
-
-    void update(CityModel cityModel);
-
-    void deleteById(long id);
-
 
     Page<City> findByPage(Pageable paging);
 
     Page<City> findByPageWithCityName(String name, Pageable paging);
+
+    void saveOrUpdate(CityModel cityModel);
+
+    void deleteById(long id);
+
 }

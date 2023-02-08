@@ -11,9 +11,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CityModel {
+
     private long id;
+
     @NotBlank(message = "Please type city name")
     @Pattern(regexp = "^([^<>~`'!|@#^*+=:;/?%$]|[0-9]){0,100}$", message = "Please type excluding special characters")
     @UniqueCityName(message = "City Name already exists")
     private String name;
+
 }

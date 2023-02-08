@@ -12,40 +12,18 @@ import java.util.List;
 
 @Service
 public class CityServiceImpl implements CityService {
+
     @Autowired
     CityRepository cityRepository;
 
     @Override
-    public List<City> findAll() {
-        return cityRepository.findAllByOrderByNameAsc();
-    }
-
-    @Override
-    public void save(CityModel cityModel) {
-        City city = City.builder()
-                .id(cityModel.getId())
-                .name(cityModel.getName())
-                .build();
-        cityRepository.save(city);
-    }
-
-    @Override
-    public Boolean existsByName(String s) {
+    public boolean existsByName(String s) {
         return cityRepository.existsByName(s);
     }
 
     @Override
-    public void update(CityModel cityModel) {
-        City city = City.builder()
-                        .id(cityModel.getId())
-                        .name(cityModel.getName())
-                        .build();
-        cityRepository.save(city);
-    }
-
-    @Override
-    public void deleteById(long id) {
-        cityRepository.deleteById(id);
+    public List<City> findAll() {
+        return cityRepository.findAllByOrderByNameAsc();
     }
 
     @Override
@@ -58,5 +36,18 @@ public class CityServiceImpl implements CityService {
         return cityRepository.findByNameStartingWithIgnoreCaseOrderByNameAsc(name, paging);
     }
 
+    @Override
+    public void saveOrUpdate(CityModel cityModel) {
+        City city = City.builder()
+                .id(cityModel.getId())
+                .name(cityModel.getName())
+                .build();
+        cityRepository.save(city);
+    }
+
+    @Override
+    public void deleteById(long id) {
+        cityRepository.deleteById(id);
+    }
 
 }

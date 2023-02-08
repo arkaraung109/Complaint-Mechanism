@@ -118,26 +118,17 @@
     <footer id="footer" class="footer">
     </footer><!-- End Footer -->
     <script th:inline="javascript">
+
         $(document).ready(function() {
 
+            <!-- Search Boxes in Select Dropdown -->
             var cityName = document.querySelector("#cityName");
             var city = document.querySelector("#city");
             dselect(city, {search: true});
             dselect(cityName, {search: true});
+            <!-- End -->
 
-            $(document).delegate(".btn-edit", "click", function() {
-                var parent = $(this).parent().parent().parent();
-                var id = parent.children("td:nth-child(1)").html();
-                var townshipName = parent.children("td:nth-child(3)").html();
-                var city_name = parent.children("td:nth-child(4)").html();
-                $("#township-name").val(townshipName);
-                var button = $("#submitForm .row .col-sm-3 .dselect-wrapper .dropdown-menu .d-flex .dselect-items button:contains(" + city_name + ")");
-                button.click();
-                $(".btn-update").prop("disabled", false);
-                $(".btn-update").append("<span hidden>" + id + "</span>");
-
-            });
-
+            <!-- Success Alert Boxes -->
             if([[${added_success}]]) {
                 iziToast.success({
                     message: 'Successfully Added!',
@@ -160,7 +151,46 @@
                     position: 'topCenter'
                 });
             }
+            <!-- End -->
 
+            <!-- When add button is clicked -->
+            $(".btn-add").click(function(event) {
+                event.preventDefault();
+                $.confirm({
+                    title: 'Confirm!',
+                    content: 'Are you sure to add?',
+                    type: 'green',
+                    autoClose: 'no|10000',
+                    buttons: {
+                        yes: {
+                            btnClass: 'btn-success',
+                            action: function () {
+                                $("#submitForm").prop("action", "/api/township/add");
+                                $("#submitForm").submit();
+                            }
+                        },
+                        no: function () {}
+                    }
+                });
+            });
+            <!-- End -->
+
+            <!-- When edit button is clicked -->
+            $(document).delegate(".btn-edit", "click", function() {
+                var parent = $(this).parent().parent().parent();
+                var id = parent.children("td:nth-child(1)").html();
+                var townshipName = parent.children("td:nth-child(3)").html();
+                var city_name = parent.children("td:nth-child(4)").html();
+
+                $("#township-name").val(townshipName);
+                $("#submitForm .row .col-sm-3 .dselect-wrapper .dropdown-menu .d-flex .dselect-items button:contains(" + city_name + ")").click();
+                $(".btn-update").prop("disabled", false);
+                $(".btn-update").append("<span hidden>" + id + "</span>");
+
+            });
+            <!-- End -->
+
+            <!-- When update button is clicked -->
             $(".btn-update").click(function() {
                 event.preventDefault();
                 $.confirm({
@@ -177,37 +207,18 @@
                                 $("#submitForm").submit();
                             }
                         },
-                        no: function () {
-                        }
+                        no: function () {}
                     }
                 });
             });
+            <!-- End -->
 
-            $(".btn-add").click(function(event) {
-                event.preventDefault();
-                $.confirm({
-                    title: 'Confirm!',
-                    content: 'Are you sure to add?',
-                    type: 'green',
-                    autoClose: 'no|10000',
-                    buttons: {
-                        yes: {
-                            btnClass: 'btn-success',
-                            action: function () {
-                                $("#submitForm").prop("action", "/api/township/add");
-                                $("#submitForm").submit();
-                            }
-                        },
-                        no: function () {
-                        }
-                    }
-                });
-            });
-
+            <!-- When delete button is clicked -->
             $(document).delegate(".btn-delete", "click", function() {
                 event.preventDefault();
                 var parent = $(this).parent().parent().parent();
                 var id = parent.children("td:nth-child(1)").html();
+
                 $.confirm({
                     title: 'Confirm!',
                     content: "Are you sure to delete?",
@@ -220,16 +231,19 @@
                                 window.location = "/api/township/delete/" + id;
                             }
                         },
-                        no: function () {
-                        }
+                        no: function () {}
                     }
                 });
             });
+            <!-- End -->
 
+            <!-- When clear button is clicked -->
             $("#btnClear").on("click", function(e) {
               e.preventDefault();
               window.location = "/api/township/";
             });
+            <!-- End -->
+
         });
 
     </script>

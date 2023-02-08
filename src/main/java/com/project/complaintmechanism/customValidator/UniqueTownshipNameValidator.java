@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class UniqueTownshipNameValidator implements ConstraintValidator<UniqueTownshipName, String> {
+
     @Autowired
     TownshipService townshipService;
 
@@ -15,4 +16,5 @@ public class UniqueTownshipNameValidator implements ConstraintValidator<UniqueTo
     public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
         return !townshipService.existsByName(s);
     }
+
 }

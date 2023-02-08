@@ -16,10 +16,13 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class IndustrialZone {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
     private String name;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "township_id")
     @JsonBackReference
@@ -28,4 +31,5 @@ public class IndustrialZone {
     @OneToMany(mappedBy = "industrialZone", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<Company> companyList;
+
 }

@@ -8,13 +8,15 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TownshipRepository extends JpaRepository<Township, Long> {
+
     boolean existsByName(String name);
 
-    Page<Township> findByCityName(String name, Pageable paging);
-
     Page<Township> findAllByOrderByNameAsc(Pageable paging);
+
+    Page<Township> findByCityName(String name, Pageable paging);
 
     Page<Township> findByNameStartingWithIgnoreCaseOrderByNameAsc(String keyword, Pageable paging);
 
     Page<Township> findByNameStartingWithIgnoreCaseAndCityNameOrderByNameAsc(String keyword, String cityName, Pageable paging);
+
 }

@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface TownshipService {
+
     boolean existsByName(String s);
 
     Page<Township> findByPage(Pageable paging);
@@ -16,5 +17,7 @@ public interface TownshipService {
 
     Page<Township> findByPageWithCityNameAndTownshipName(String cityName, String keyword, Pageable paging);
 
-    void save(TownshipModel townshipModel);
+    void saveOrUpdate(TownshipModel townshipModel);
+
+    void deleteById(long id);
 }
