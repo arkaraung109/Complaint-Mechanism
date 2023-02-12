@@ -20,7 +20,7 @@ public class City {
 
     private String name;
 
-    @OneToMany(mappedBy = "city", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "city")
     @JsonManagedReference
     private List<Township> townshipList;
 

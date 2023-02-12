@@ -7,14 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UniqueCityNameValidator implements ConstraintValidator<UniqueCityName, String> {
+public class UniqueCityValidator implements ConstraintValidator<UniqueCity, String> {
 
     @Autowired
     CityService cityService;
 
     @Override
-    public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
-        return !cityService.existsByName(s);
+    public boolean isValid(String name, ConstraintValidatorContext constraintValidatorContext) {
+        return !cityService.existsByName(name);
     }
 
 }

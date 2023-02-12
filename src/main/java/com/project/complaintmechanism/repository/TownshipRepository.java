@@ -4,19 +4,29 @@ import com.project.complaintmechanism.entity.Township;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public interface TownshipRepository extends JpaRepository<Township, Long> {
 
-    boolean existsByName(String name);
+    @Query(value = "select exists(select t.name from township t, city c where t.city_id=c.id and c.name=?1 and t.name=?2)", nativeQuery = true)
+    int findExistsByCityName(String cityName, String townshipName);
 
-    Page<Township> findAllByOrderByNameAsc(Pageable paging);
+    Township findByNameAndCityName(String townshipName, String cityName);
 
-    Page<Township> findByCityName(String name, Pageable paging);
+    List<Township> findByCityName(String cityName);
 
-    Page<Township> findByNameStartingWithIgnoreCaseOrderByNameAsc(String keyword, Pageable paging);
+    List<Township> findAllByOrderByNameAsc();
 
-    Page<Township> findByNameStartingWithIgnoreCaseAndCityNameOrderByNameAsc(String keyword, String cityName, Pageable paging);
+    Page<Township> findAllByOrderByNameAscCityNameAsc(Pageable paging);
+
+    Page<Township> findByCityNameOrderByNameAscCityNameAsc(String cityName, Pageable paging);
+
+    Page<Township> findByNameStartingWithIgnoreCaseOrderByNameAscCityNameAsc(String keyword, Pageable paging);
+
+    Page<Township> findByNameStartingWithIgnoreCaseAndCityNameOrderByNameAscCityNameAsc(String keyword, String cityName, Pageable paging);
 
 }

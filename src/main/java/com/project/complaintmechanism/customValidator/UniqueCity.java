@@ -11,10 +11,10 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-@Constraint(validatedBy = {UniqueCityNameValidator.class})
+@Constraint(validatedBy = {UniqueCityValidator.class})
 @Retention(RUNTIME)
 @Target({ FIELD, METHOD })
-public @interface UniqueCityName {
+public @interface UniqueCity {
 
     public String message() default "Name already exists!";
 

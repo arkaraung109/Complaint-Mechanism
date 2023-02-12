@@ -166,7 +166,7 @@ function dselect(el, option = {}) {
         const disabled = el.multiple && option.selected ? ' disabled' : ''
         const value = option.value
         const text = option.textContent
-        items.push(`<button${hidden} class="dropdown-item${active}" data-dselect-value="${value}" type="button" onclick="dselectUpdate(this, '${classElement}', '${classToggler}')"${disabled}>${text}</button>`)
+        items.push(`<button class="dropdown-item${active}" data-dselect-value="${value}" type="button" onclick="dselectUpdate(this, '${classElement}', '${classToggler}')"${disabled}>${text}</button>`)
       }
     }
     items = items.join('')
@@ -199,7 +199,7 @@ function dselect(el, option = {}) {
           <div class="dselect-items" style="max-height:${maxHeight};overflow:auto">
             ${itemTags(el.querySelectorAll('*'))}
           </div>
-          <div class="${classNoResults} d-none">No results found</div>
+          <div class="${classNoResults} d-none mt-2">No results found!</div>
         </div>
       </div>
       ${clearBtn}

@@ -6,14 +6,13 @@ import jakarta.validation.Payload;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-@Constraint(validatedBy = {UniqueTownshipNameValidator.class})
+@Constraint(validatedBy = {UniqueIndustrialZoneValidator.class})
 @Retention(RUNTIME)
-@Target({ FIELD, METHOD })
-public @interface UniqueTownshipName {
+@Target({TYPE})
+public @interface UniqueIndustrialZone {
 
     public String message() default "Name already exists!";
 

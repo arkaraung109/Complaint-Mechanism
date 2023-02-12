@@ -1,9 +1,11 @@
 package com.project.complaintmechanism.controller;
 
 import com.project.complaintmechanism.entity.City;
+import com.project.complaintmechanism.entity.IndustrialZone;
 import com.project.complaintmechanism.entity.Township;
 import com.project.complaintmechanism.model.TownshipModel;
 import com.project.complaintmechanism.service.CityService;
+import com.project.complaintmechanism.service.IndustrialZoneService;
 import com.project.complaintmechanism.service.TownshipService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/api/township")
@@ -26,12 +29,14 @@ public class TownshipController {
     CityService cityService;
     @Autowired
     TownshipService townshipService;
+    @Autowired
+    IndustrialZoneService industrialZoneService;
 
     @GetMapping("/")
     public String showList(Model model) {
 
         model.addAttribute("township", new TownshipModel());
-        return getByPage(model, null, null,1, 5);
+        return getByPage(model, null, null, 1, 5);
 
     }
 
@@ -40,6 +45,7 @@ public class TownshipController {
 
         model.addAttribute("township", new TownshipModel());
         return getByPage(model, cityName, keyword, page, size);
+
     }
 
     public String getByPage(Model model, String cityName, String keyword, int page, int size) {
@@ -91,23 +97,46 @@ public class TownshipController {
     }
 
     @PostMapping("/update/{id}")
-    public String update(@PathVariable("id") long id, @Valid @ModelAttribute TownshipModel townshipModel, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
+    public String update(@PathVariable("id") long id, @Valid @ModelAttribute("township") TownshipModel townshipModel, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
 
-        if(!result.hasErrors()) {
-            townshipModel.setId(id);
-            townshipService.saveOrUpdate(townshipModel);
-            redirectAttributes.addFlashAttribute("updated_success", true);
+        Optional<Township> township = townshipService.findById(id);
+        if(township.isPresent()) {
+            if(!result.hasErrors()) {
+                townshipModel.setId(id);
+                townshipService.saveOrUpdate(townshipModel);
+                redirectAttributes.addFlashAttribute("updated_success", true);
+                return "redirect:/api/township/";
+            }
+
+            return getByPage(model, null, null, 1, 5);
+        }
+        else {
+            redirectAttributes.addFlashAttribute("township_not_found", true);
             return "redirect:/api/township/";
         }
-        return getByPage(model, null, null,1, 5);
 
     }
 
     @GetMapping("/delete/{id}")
     public String delete(@PathVariable("id") long id, RedirectAttributes redirectAttributes) {
 
-        townshipService.deleteById(id);
-        redirectAttributes.addFlashAttribute("deleted_success", true);
+        Optional<Township> township = townshipService.findById(id);
+
+        if(township.isPresent()) {
+            List<IndustrialZone> industrialZoneList = township.get().getIndustrialZoneList();
+
+            if(industrialZoneList.isEmpty()) {
+                townshipService.deleteById(id);
+                redirectAttributes.addFlashAttribute("deleted_success", true);
+            }
+            else {
+                redirectAttributes.addFlashAttribute("deleted_fail", true);
+            }
+        }
+        else {
+            redirectAttributes.addFlashAttribute("township_not_found", true);
+        }
+
         return "redirect:/api/township/";
 
     }

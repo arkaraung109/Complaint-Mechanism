@@ -5,7 +5,6 @@
     <title>Township List</title>
     <div th:replace="~{fragments/include :: include}"></div>
     <script th:src="@{/js/main.js}"></script>
-
 </head>
 <body>
     <div th:replace="~{fragments/header :: header}"></div>
@@ -21,24 +20,22 @@
 
         <section class="section">
             <div class="row align-items-top">
-                <div class="col-lg-12">
+                <div class="col-12">
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">New/Update</h5>
                             <form th:object="${township}" id="submitForm" method="POST">
                                 <div class="row mb-3">
-                                    <label for="city" class="col-sm-2 col-form-label">City Name</label>
-                                    <div class="col-sm-3">
-                                        <select class="form-select" id="city" th:field="*{cityName}">
+                                    <label for="cityName" class="col-2 col-form-label">City Name</label>
+                                    <div class="col-3" id="city-select">
+                                        <select class="form-select" id="cityName" th:field="*{cityName}">
                                             <option value="" selected>--- Choose ---</option>
-                                            <th:block th:each="c : ${cityList}">
-                                                <option  th:text="${c.name}" th:value="${c.name}"></option>
-                                            </th:block>
+                                            <option th:each="c : ${cityList}" th:text="${c.name}" th:value="${c.name}"></option>
                                         </select>
                                         <span class="text-small text-danger" th:if="${#fields.hasErrors('cityName')}" th:errors="*{cityName}"></span>
                                     </div>
-                                    <label for="township-name" class="col-sm-2 col-form-label">Township Name</label>
-                                    <div class="col-sm-3">
+                                    <label for="township-name" class="col-2 col-form-label">Township Name</label>
+                                    <div class="col-3">
                                         <input type="text" class="form-control" id="township-name" th:field="*{name}">
                                         <span class="text-small text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
                                     </div>
@@ -51,7 +48,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-12">
+                <div class="col-12">
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title text-danger" th:if="${townshipList.isEmpty()}">No record found!</h5>
@@ -59,11 +56,11 @@
                             <hr>
                             <form th:action="@{/api/township/page}" id="searchForm" class="mt-4">
                                 <div class="row mb-4">
-                                    <label for="cityName" class="col-2 col-form-label">City Name</label>
+                                    <label for="citySearch" class="col-2 col-form-label">City Name</label>
                                     <div class="col-3">
-                                        <select class="form-select" id="cityName" name="cityName">
+                                        <select class="form-select" id="citySearch" name="cityName">
                                             <option value="" selected>-- Choose for Searching --</option>
-                                            <option th:each="city : ${cityList}" th:text="${city.name}" th:value="${city.name}" th:selected="${city.name == cityName}"></option>
+                                            <option th:each="c : ${cityList}" th:text="${c.name}" th:value="${c.name}" th:selected="${c.name == cityName}"></option>
                                         </select>
                                     </div>
                                     <div class="col-5">
@@ -123,14 +120,15 @@
 
             <!-- Search Boxes in Select Dropdown -->
             var cityName = document.querySelector("#cityName");
-            var city = document.querySelector("#city");
-            dselect(city, {search: true});
+            var citySearch = document.querySelector("#citySearch");
             dselect(cityName, {search: true});
+            dselect(citySearch, {search: true});
             <!-- End -->
 
-            <!-- Success Alert Boxes -->
+            <!-- Alert Boxes -->
             if([[${added_success}]]) {
                 iziToast.success({
+                    title: 'Done',
                     message: 'Successfully Added!',
                     position: 'topCenter'
                 });
@@ -139,6 +137,7 @@
             if([[${updated_success}]]) {
                 iziToast.success({
                     color: 'blue',
+                    title: 'Done',
                     message: 'Successfully Updated!',
                     position: 'topCenter'
                 });
@@ -147,7 +146,26 @@
             if([[${deleted_success}]]) {
                 iziToast.success({
                     color: 'red',
+                    title: 'Done',
                     message: 'Successfully Deleted!',
+                    position: 'topCenter'
+                });
+            }
+
+            if([[${deleted_fail}]]) {
+               iziToast.error({
+                    color: 'red',
+                    title: 'Failed!',
+                    message: 'Please delete all industrial zones included in this township first.',
+                    position: 'topCenter'
+                });
+            }
+
+            if([[${township_not_found}]]) {
+                iziToast.error({
+                    color: 'red',
+                    title: 'Failed!',
+                    message: 'This township is not found!',
                     position: 'topCenter'
                 });
             }
@@ -156,6 +174,7 @@
             <!-- When add button is clicked -->
             $(".btn-add").click(function(event) {
                 event.preventDefault();
+
                 $.confirm({
                     title: 'Confirm!',
                     content: 'Are you sure to add?',
@@ -179,20 +198,21 @@
             $(document).delegate(".btn-edit", "click", function() {
                 var parent = $(this).parent().parent().parent();
                 var id = parent.children("td:nth-child(1)").html();
-                var townshipName = parent.children("td:nth-child(3)").html();
+                var township_name = parent.children("td:nth-child(3)").html();
                 var city_name = parent.children("td:nth-child(4)").html();
 
-                $("#township-name").val(townshipName);
-                $("#submitForm .row .col-sm-3 .dselect-wrapper .dropdown-menu .d-flex .dselect-items button:contains(" + city_name + ")").click();
+                $("#township-name").val(township_name);
+                $("#submitForm .row #city-select .dselect-wrapper .dropdown-menu .d-flex .dselect-items button:contains(" + city_name + ")").click();
                 $(".btn-update").prop("disabled", false);
                 $(".btn-update").append("<span hidden>" + id + "</span>");
-
+                $("#township-name").focus();
             });
             <!-- End -->
 
             <!-- When update button is clicked -->
             $(".btn-update").click(function() {
                 event.preventDefault();
+
                 $.confirm({
                     title: 'Confirm!',
                     content: 'Are you sure to update?',

@@ -1,6 +1,7 @@
 package com.project.complaintmechanism.controller;
 
 import com.project.complaintmechanism.entity.City;
+import com.project.complaintmechanism.entity.Township;
 import com.project.complaintmechanism.model.CityModel;
 import com.project.complaintmechanism.service.CityService;
 import jakarta.validation.Valid;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/api/city")
@@ -59,6 +61,7 @@ public class CityController {
         model.addAttribute("totalPages", cityPage.getTotalPages());
         model.addAttribute("pageSize", size);
         return "city_list";
+
     }
 
     @PostMapping("/add")
@@ -76,21 +79,45 @@ public class CityController {
     @PostMapping("/update/{id}")
     public String update(@PathVariable("id") long id, @Valid @ModelAttribute("city") CityModel cityModel, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
 
-        if(!result.hasErrors())  {
-            cityModel.setId(id);
-            cityService.saveOrUpdate(cityModel);
-            redirectAttributes.addFlashAttribute("updated_success", true);
+        Optional<City> city = cityService.findById(id);
+
+        if(city.isPresent()) {
+            if(!result.hasErrors())  {
+                cityModel.setId(id);
+                cityService.saveOrUpdate(cityModel);
+                redirectAttributes.addFlashAttribute("updated_success", true);
+                return "redirect:/api/city/";
+            }
+
+            return getByPage(model, null, 1, 5);
+        }
+        else {
+            redirectAttributes.addFlashAttribute("city_not_found", true);
             return "redirect:/api/city/";
         }
-        return getByPage(model, null, 1, 5);
 
     }
 
     @GetMapping("/delete/{id}")
-    public String delete(@PathVariable("id") long id, RedirectAttributes redirectAttributes) {
+    public String delete(@PathVariable("id") long id, Model model, RedirectAttributes redirectAttributes) {
 
-        cityService.deleteById(id);
-        redirectAttributes.addFlashAttribute("deleted_success", true);
+        Optional<City> city = cityService.findById(id);
+
+        if(city.isPresent()) {
+            List<Township> townshipList = city.get().getTownshipList();
+
+            if(townshipList.isEmpty()) {
+                cityService.deleteById(id);
+                redirectAttributes.addFlashAttribute("deleted_success", true);
+            }
+            else {
+                redirectAttributes.addFlashAttribute("deleted_fail", true);
+            }
+        }
+        else {
+            redirectAttributes.addFlashAttribute("city_not_found", true);
+        }
+
         return "redirect:/api/city/";
 
     }

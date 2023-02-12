@@ -13,12 +13,12 @@ public interface CityRepository extends JpaRepository<City, Long> {
 
     boolean existsByName(String name);
 
+    City findByName(String cityName);
+
     List<City> findAllByOrderByNameAsc();
 
     Page<City> findAllByOrderByNameAsc(Pageable paging);
 
-    City findByName(String cityName);
-
-    Page<City> findByNameStartingWithIgnoreCaseOrderByNameAsc(String name, Pageable paging);
+    Page<City> findByNameStartingWithIgnoreCaseOrderByNameAsc(String cityName, Pageable paging);
 
 }

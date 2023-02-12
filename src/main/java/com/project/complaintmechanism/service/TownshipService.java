@@ -5,9 +5,18 @@ import com.project.complaintmechanism.model.TownshipModel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+import java.util.Optional;
+
 public interface TownshipService {
 
-    boolean existsByName(String s);
+    boolean findExistsByCityName(String cityName, String townshipName);
+
+    Optional<Township> findById(long id);
+
+    List<Township> findByCityName(String cityName);
+
+    List<Township> findAll();
 
     Page<Township> findByPage(Pageable paging);
 
@@ -20,4 +29,5 @@ public interface TownshipService {
     void saveOrUpdate(TownshipModel townshipModel);
 
     void deleteById(long id);
+
 }

@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CityServiceImpl implements CityService {
@@ -17,8 +18,8 @@ public class CityServiceImpl implements CityService {
     CityRepository cityRepository;
 
     @Override
-    public boolean existsByName(String s) {
-        return cityRepository.existsByName(s);
+    public boolean existsByName(String name) {
+        return cityRepository.existsByName(name);
     }
 
     @Override
@@ -27,13 +28,18 @@ public class CityServiceImpl implements CityService {
     }
 
     @Override
+    public Optional<City> findById(long id) {
+        return cityRepository.findById(id);
+    }
+
+    @Override
     public Page<City> findByPage(Pageable paging) {
         return cityRepository.findAllByOrderByNameAsc(paging);
     }
 
     @Override
-    public Page<City> findByPageWithCityName(String name, Pageable paging) {
-        return cityRepository.findByNameStartingWithIgnoreCaseOrderByNameAsc(name, paging);
+    public Page<City> findByPageWithCityName(String cityName, Pageable paging) {
+        return cityRepository.findByNameStartingWithIgnoreCaseOrderByNameAsc(cityName, paging);
     }
 
     @Override

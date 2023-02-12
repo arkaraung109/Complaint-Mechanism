@@ -10,6 +10,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+
 @Service
 public class TownshipServiceImpl implements TownshipService {
 
@@ -19,28 +22,43 @@ public class TownshipServiceImpl implements TownshipService {
     TownshipRepository townshipRepository;
 
     @Override
-    public boolean existsByName(String s) {
-        return townshipRepository.existsByName(s);
+    public boolean findExistsByCityName(String cityName, String townshipName) {
+        return (townshipRepository.findExistsByCityName(cityName, townshipName)) == 1;
+    }
+
+    @Override
+    public Optional<Township> findById(long id) {
+        return townshipRepository.findById(id);
+    }
+
+    @Override
+    public List<Township> findByCityName(String cityName) {
+        return townshipRepository.findByCityName(cityName);
+    }
+
+    @Override
+    public List<Township> findAll() {
+        return townshipRepository.findAllByOrderByNameAsc();
     }
 
     @Override
     public Page<Township> findByPage(Pageable paging) {
-        return townshipRepository.findAllByOrderByNameAsc(paging);
+        return townshipRepository.findAllByOrderByNameAscCityNameAsc(paging);
     }
 
     @Override
     public Page<Township> findByPageWithCityName(String cityName, Pageable paging) {
-        return townshipRepository.findByCityName(cityName, paging);
+        return townshipRepository.findByCityNameOrderByNameAscCityNameAsc(cityName, paging);
     }
 
     @Override
     public Page<Township> findByPageWithTownshipName(String keyword, Pageable paging) {
-        return townshipRepository.findByNameStartingWithIgnoreCaseOrderByNameAsc(keyword, paging);
+        return townshipRepository.findByNameStartingWithIgnoreCaseOrderByNameAscCityNameAsc(keyword, paging);
     }
 
     @Override
     public Page<Township> findByPageWithCityNameAndTownshipName(String cityName, String keyword, Pageable paging) {
-        return townshipRepository.findByNameStartingWithIgnoreCaseAndCityNameOrderByNameAsc(keyword, cityName, paging);
+        return townshipRepository.findByNameStartingWithIgnoreCaseAndCityNameOrderByNameAscCityNameAsc(keyword, cityName, paging);
     }
 
     @Override
@@ -49,7 +67,6 @@ public class TownshipServiceImpl implements TownshipService {
                         .id(cityRepository.findByName(townshipModel.getCityName()).getId())
                         .name(townshipModel.getCityName())
                         .build();
-        System.out.println(city.getId());
         Township township = Township.builder()
                                     .id(townshipModel.getId())
                                     .name(townshipModel.getName())
