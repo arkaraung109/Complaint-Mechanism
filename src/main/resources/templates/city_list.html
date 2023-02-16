@@ -26,9 +26,9 @@
                             <h5 class="card-title">New/Update</h5>
                             <form th:object="${city}" id="submitForm" method="POST">
                                 <div class="row mb-3">
-                                    <label for="city-name" class="col-2 col-form-label">City Name</label>
+                                    <label for="cityName" class="col-2 col-form-label">City Name</label>
                                     <div class="col-6">
-                                        <input type="text" class="form-control" id="city-name" th:field="*{name}">
+                                        <input type="text" class="form-control" id="cityName" th:field="*{name}">
                                         <span class="text-small text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
                                     </div>
                                     <div class="col-2">
@@ -103,7 +103,7 @@
 
         $(document).ready(function() {
 
-            <!-- Alert Boxes -->
+        <!-- Alert Boxes -->
             if([[${added_success}]]) {
                 iziToast.success({
                     title: 'Done',
@@ -134,7 +134,7 @@
                iziToast.error({
                     color: 'red',
                     title: 'Failed!',
-                    message: 'Please delete all townships included in this city first.',
+                    message: 'Please delete all townships included in this city at first.',
                     position: 'topCenter'
                 });
             }
@@ -147,9 +147,9 @@
                     position: 'topCenter'
                 });
             }
-            <!-- End -->
+        <!-- End -->
 
-            <!-- When add button is clicked -->
+        <!-- When add button is clicked -->
             $(".btn-add").click(function(event) {
                 event.preventDefault();
 
@@ -170,22 +170,22 @@
                     }
                 });
             });
-            <!-- End -->
+        <!-- End -->
 
-            <!-- When edit button is clicked -->
+        <!-- When edit button is clicked -->
             $(document).delegate(".btn-edit", "click", function() {
                 var parent = $(this).parent().parent().parent();
                 var id = parent.children("td:nth-child(1)").html();
                 var cityName = parent.children("td:nth-child(3)").html();
 
-                $("#city-name").val(cityName);
+                $("#cityName").val(cityName);
                 $(".btn-update").prop("disabled", false);
                 $(".btn-update").append("<span hidden>" + id + "</span>");
-                $("#city-name").focus();
+                $("#cityName").focus();
             });
-            <!-- End -->
+        <!-- End -->
 
-            <!-- When update button is clicked -->
+        <!-- When update button is clicked -->
             $(".btn-update").click(function() {
                 event.preventDefault();
 
@@ -207,9 +207,9 @@
                     }
                 });
             });
-            <!-- End -->
+        <!-- End -->
 
-            <!-- When delete button is clicked -->
+        <!-- When delete button is clicked -->
             $(document).delegate(".btn-delete", "click", function() {
                 event.preventDefault();
                 var parent = $(this).parent().parent().parent();
@@ -231,14 +231,14 @@
                     }
                 });
             });
-            <!-- End -->
+        <!-- End -->
 
-            <!-- When clear button is clicked -->
+        <!-- When clear button is clicked -->
             $("#btnClear").on("click", function(e) {
               e.preventDefault();
               window.location = "/api/city/";
             });
-            <!-- End -->
+        <!-- End -->
 
         });
 

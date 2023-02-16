@@ -29,9 +29,25 @@ public class ComplaintForm {
 
     private boolean readStatus;
 
-    private boolean acceptStatus;
+    private boolean acceptedStatus;
 
     private boolean solvedStatus;
+
+    private String name;
+
+    private String gender;
+
+    private String phone;
+
+    private String email;
+
+    private String idCardFront;
+
+    private String idCardBack;
+
+    private String ecPhoto1;
+
+    private String ecPhoto2;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id")

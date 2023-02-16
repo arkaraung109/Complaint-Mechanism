@@ -19,8 +19,8 @@ public class IndustrialZoneModel {
 
     @NotBlank(message = "Please enter industrial zone name")
     @Pattern.List({
-            @Pattern(regexp = "^([a-zA-Z\\s<>~`!\\[\\]|@#^*+=:;/?%$\"\\\\]+)|(\\s*)$", message = "Please enter starting with alphabet"),
-            @Pattern(regexp = "^([^<>~`!\\[\\]|@#^*+=:;/?%$\"\\\\]|[0-9]){0,100}$", message = "Please enter excluding special characters")
+            @Pattern(regexp = "^([a-zA-Z\\s]+.*$){0,100}", message = "Please enter starting with alphabet"),
+            @Pattern(regexp = "^([^<>~`!\\[\\]{}|@#^*+=:;/?%$\"\\\\]|[0-9]){0,100}$", message = "Please enter excluding special characters")
     })
     private String name;
 

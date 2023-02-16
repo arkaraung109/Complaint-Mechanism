@@ -34,9 +34,9 @@
                                         </select>
                                         <span class="text-small text-danger" th:if="${#fields.hasErrors('cityName')}" th:errors="*{cityName}"></span>
                                     </div>
-                                    <label for="township-name" class="col-2 col-form-label">Township Name</label>
+                                    <label for="townshipName" class="col-2 col-form-label">Township Name</label>
                                     <div class="col-3">
-                                        <input type="text" class="form-control" id="township-name" th:field="*{name}">
+                                        <input type="text" class="form-control" id="townshipName" th:field="*{name}">
                                         <span class="text-small text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
                                     </div>
                                 </div>
@@ -118,14 +118,14 @@
 
         $(document).ready(function() {
 
-            <!-- Search Boxes in Select Dropdown -->
+        <!-- Search Boxes in Select Dropdown -->
             var cityName = document.querySelector("#cityName");
             var citySearch = document.querySelector("#citySearch");
             dselect(cityName, {search: true});
             dselect(citySearch, {search: true});
-            <!-- End -->
+        <!-- End -->
 
-            <!-- Alert Boxes -->
+        <!-- Alert Boxes -->
             if([[${added_success}]]) {
                 iziToast.success({
                     title: 'Done',
@@ -156,7 +156,7 @@
                iziToast.error({
                     color: 'red',
                     title: 'Failed!',
-                    message: 'Please delete all industrial zones included in this township first.',
+                    message: 'Please delete all industrial zones included in this township at first.',
                     position: 'topCenter'
                 });
             }
@@ -169,9 +169,9 @@
                     position: 'topCenter'
                 });
             }
-            <!-- End -->
+        <!-- End -->
 
-            <!-- When add button is clicked -->
+        <!-- When add button is clicked -->
             $(".btn-add").click(function(event) {
                 event.preventDefault();
 
@@ -192,24 +192,24 @@
                     }
                 });
             });
-            <!-- End -->
+        <!-- End -->
 
-            <!-- When edit button is clicked -->
+        <!-- When edit button is clicked -->
             $(document).delegate(".btn-edit", "click", function() {
                 var parent = $(this).parent().parent().parent();
                 var id = parent.children("td:nth-child(1)").html();
                 var township_name = parent.children("td:nth-child(3)").html();
                 var city_name = parent.children("td:nth-child(4)").html();
 
-                $("#township-name").val(township_name);
+                $("#townshipName").val(township_name);
                 $("#submitForm .row #city-select .dselect-wrapper .dropdown-menu .d-flex .dselect-items button:contains(" + city_name + ")").click();
                 $(".btn-update").prop("disabled", false);
                 $(".btn-update").append("<span hidden>" + id + "</span>");
-                $("#township-name").focus();
+                $("#townshipName").focus();
             });
-            <!-- End -->
+        <!-- End -->
 
-            <!-- When update button is clicked -->
+        <!-- When update button is clicked -->
             $(".btn-update").click(function() {
                 event.preventDefault();
 
@@ -231,9 +231,9 @@
                     }
                 });
             });
-            <!-- End -->
+        <!-- End -->
 
-            <!-- When delete button is clicked -->
+        <!-- When delete button is clicked -->
             $(document).delegate(".btn-delete", "click", function() {
                 event.preventDefault();
                 var parent = $(this).parent().parent().parent();
@@ -255,14 +255,14 @@
                     }
                 });
             });
-            <!-- End -->
+        <!-- End -->
 
-            <!-- When clear button is clicked -->
+        <!-- When clear button is clicked -->
             $("#btnClear").on("click", function(e) {
               e.preventDefault();
               window.location = "/api/township/";
             });
-            <!-- End -->
+        <!-- End -->
 
         });
 

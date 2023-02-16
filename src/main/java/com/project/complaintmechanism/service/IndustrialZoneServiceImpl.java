@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -31,43 +32,53 @@ public class IndustrialZoneServiceImpl implements IndustrialZoneService {
     }
 
     @Override
+    public List<IndustrialZone> findByTownshipName(String townshipName) {
+        return industrialZoneRepository.findByTownshipName(townshipName);
+    }
+
+    @Override
+    public List<IndustrialZone> findAll() {
+        return industrialZoneRepository.findAllByOrderByNameAsc();
+    }
+
+    @Override
     public Page<IndustrialZone> findByPage(Pageable paging) {
-        return industrialZoneRepository.findAllByOrderByNameAsc(paging);
+        return industrialZoneRepository.findByPage(paging);
     }
 
     @Override
     public Page<IndustrialZone> findByPageWithIndustrialZoneName(String keyword, Pageable paging) {
-        return industrialZoneRepository.findByNameStartingWithIgnoreCaseOrderByNameAsc(keyword, paging);
+        return industrialZoneRepository.findByPageWithIndustrialZoneName(keyword, paging);
     }
 
     @Override
     public Page<IndustrialZone> findByPageWithCityName(String cityName, Pageable paging) {
-        return industrialZoneRepository.findByCityNameOrderByNameAsc(cityName, paging);
+        return industrialZoneRepository.findByPageWithCityName(cityName, paging);
     }
 
     @Override
     public Page<IndustrialZone> findByPageWithTownshipName(String townshipName, Pageable paging) {
-        return industrialZoneRepository.findByTownshipNameOrderByNameAsc(townshipName, paging);
+        return industrialZoneRepository.findByPageWithTownshipName(townshipName, paging);
     }
 
     @Override
     public Page<IndustrialZone> findByPageWithCityNameAndIndustrialZoneName(String cityName, String keyword, Pageable paging) {
-        return industrialZoneRepository.findByNameStartingWithIgnoreCaseAndCityNameOrderByNameAsc(keyword, cityName, paging);
+        return industrialZoneRepository.findByPageWithCityNameAndIndustrialZoneName(cityName, keyword, paging);
     }
 
     @Override
     public Page<IndustrialZone> findByPageWithTownshipNameAndIndustrialZoneName(String townshipName, String keyword, Pageable paging) {
-        return industrialZoneRepository.findByNameStartingWithIgnoreCaseAndTownshipNameOrderByNameAsc(keyword, townshipName, paging);
+        return industrialZoneRepository.findByPageWithTownshipNameAndIndustrialZoneName(townshipName, keyword, paging);
     }
 
     @Override
-    public Page<IndustrialZone> findbyPageWithCityNameAndTownshipName(String cityName, String townshipName, Pageable paging) {
-        return industrialZoneRepository.findByCityNameAndTownshipNameOrderByNameAsc(cityName, townshipName, paging);
+    public Page<IndustrialZone> findByPageWithCityNameAndTownshipName(String cityName, String townshipName, Pageable paging) {
+        return industrialZoneRepository.findByPageWithCityNameAndTownshipName(cityName, townshipName, paging);
     }
 
     @Override
     public Page<IndustrialZone> findByPageWithCityNameAndTownshipNameAndIndustrialZoneName(String cityName, String townshipName, String keyword, Pageable paging) {
-        return industrialZoneRepository.findByNameStartingWithIgnoreCaseAndCityNameAndTownshipNameOrderByNameAsc(keyword, cityName, townshipName, paging);
+        return industrialZoneRepository.findByPageWithCityNameAndTownshipNameAndIndustrialZoneName(cityName, townshipName, keyword, paging);
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.project.complaintmechanism.model.IndustrialZoneModel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface IndustrialZoneService {
@@ -12,6 +13,10 @@ public interface IndustrialZoneService {
     boolean findExistsByCityNameAndTownshipName(String cityName, String townshipName, String industrialZoneName);
 
     Optional<IndustrialZone> findById(long id);
+
+    List<IndustrialZone> findByTownshipName(String townshipName);
+
+    List<IndustrialZone> findAll();
 
     Page<IndustrialZone> findByPage(Pageable paging);
 
@@ -25,7 +30,7 @@ public interface IndustrialZoneService {
 
     Page<IndustrialZone> findByPageWithTownshipNameAndIndustrialZoneName(String townshipName, String keyword, Pageable paging);
 
-    Page<IndustrialZone> findbyPageWithCityNameAndTownshipName(String cityName, String townshipName, Pageable paging);
+    Page<IndustrialZone> findByPageWithCityNameAndTownshipName(String cityName, String townshipName, Pageable paging);
 
     Page<IndustrialZone> findByPageWithCityNameAndTownshipNameAndIndustrialZoneName(String cityName, String townshipName, String keyword, Pageable paging);
 

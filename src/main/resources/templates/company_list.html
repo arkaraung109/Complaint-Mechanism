@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Industrial Zone List</title>
+    <title>Company List</title>
     <div th:replace="~{fragments/include :: include}"></div>
     <script th:src="@{/js/main.js}"></script>
 </head>
@@ -13,7 +13,7 @@
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a th:href="@{/}"><i class="fa-solid fa-house"></i><span class="mx-1">Welcome</span></a></li>
-                    <li class="breadcrumb-item"><a th:href="@{/api/industrialZone/}">Industrial Zone</a></li>
+                    <li class="breadcrumb-item"><a th:href="@{/api/company/}">Company</a></li>
                 </ol>
             </nav>
         </div>
@@ -24,7 +24,7 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">New/Update</h5>
-                            <form th:object="${industrialZone}" id="submitForm" method="POST">
+                            <form th:object="${company}" id="submitForm" method="POST">
                                 <div class="row mb-3">
                                     <label for="cityName" class="col-2 col-form-label">City Name</label>
                                     <div class="col-3" id="city-select">
@@ -44,8 +44,15 @@
                                 </div>
                                 <div class="row mb-3">
                                     <label for="industrialZoneName" class="col-2 col-form-label">Industrial Zone Name</label>
+                                    <div class="col-3" id="industrial-zone-select">
+                                        <select class="form-select" id="industrialZoneName" th:field="*{industrialZoneName}">
+                                            <option value="" selected>--- Choose ---</option>
+                                        </select>
+                                        <span class="text-small text-danger" th:if="${#fields.hasErrors('industrialZoneName')}" th:errors="*{industrialZoneName}"></span>
+                                    </div>
+                                    <label for="companyName" class="col-2 col-form-label">Company Name</label>
                                     <div class="col-3">
-                                        <input type="text" class="form-control" id="industrialZoneName" th:field="*{name}">
+                                        <input type="text" class="form-control" id="companyName" th:field="*{name}">
                                         <span class="text-small text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
                                     </div>
                                 </div>
@@ -60,10 +67,10 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title text-danger" th:if="${industrialZoneList.isEmpty()}">No record found!</h5>
-                            <h5 class="card-title">Industrial Zone List</h5>
+                            <h5 class="card-title text-danger" th:if="${companyList.isEmpty()}">No record found!</h5>
+                            <h5 class="card-title">Company List</h5>
                             <hr>
-                            <form th:action="@{/api/industrialZone/page}" id="searchForm" class="mt-4">
+                            <form th:action="@{/api/company/page}" id="searchForm" class="mt-4">
                                 <div class="row mb-4">
                                     <label for="citySearch" class="col-2 col-form-label">City Name</label>
                                     <div class="col-3">
@@ -81,9 +88,16 @@
                                     </div>
                                 </div>
                                 <div class="row mb-4">
+                                    <label for="industrialZoneSearch" class="col-2 col-form-label">Industrial Zone Name</label>
+                                    <div class="col-3">
+                                        <select class="form-select" id="industrialZoneSearch" name="industrialZoneName">
+                                            <option value="" selected>-- Choose for Searching --</option>
+                                            <option th:each="i : ${industrialZoneList}" th:text="${i.name}" th:value="${i.name}" th:selected="${i.name == industrialZoneName}"></option>
+                                        </select>
+                                    </div>
                                     <div class="col-5">
                                         <div class="input-group">
-                                            <input id="keyword" type="search" name="keyword" th:value="${keyword}" class="form-control" placeholder="&#128269; Search by industrial zone name">
+                                            <input id="keyword" type="search" name="keyword" th:value="${keyword}" class="form-control" placeholder="&#128269; Search by company name">
                                             <button type="submit" class="btn" style="background:#49b7bf; color:white; margin-right: 20px">Search</button>
                                         </div>
                                     </div>
@@ -101,30 +115,37 @@
                                 <thead>
                                 <tr style="background:#f5f7f6;">
                                     <th>#</th>
-                                    <th>Industrial Zone Name</th>
+                                    <th>Company Name</th>
                                     <th>City Name</th>
                                     <th>Township Name</th>
+                                    <th>Industrial Zone Name</th>
                                     <th>Action</th>
+                                    <th>Status</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr th:each="industrialZone, state : ${industrialZoneList}">
-                                    <td th:text="${industrialZone.id}" hidden></td>
+                                <tr th:each="company, state : ${companyList}">
+                                    <td th:text="${company.id}" hidden></td>
                                     <td th:text="${pageSize * (currentPage - 1) + state.index + 1}"></td>
-                                    <td th:text="${industrialZone.name}"></td>
-                                    <td th:text="${industrialZone.township.city.name}"></td>
-                                    <td th:text="${industrialZone.township.name}"></td>
+                                    <td th:text="${company.name}"></td>
+                                    <td th:text="${company.industrialZone.township.city.name}"></td>
+                                    <td th:text="${company.industrialZone.township.name}"></td>
+                                    <td th:text="${company.industrialZone.name}"></td>
                                     <td>
                                         <div class="btn-group btn-group-sm">
                                             <button type="button" class="btn btn-edit">Edit</button>
-                                            <a class="btn btn-delete">Delete</a>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input status" type="checkbox" role="switch" th:checked="${company.activeStatus}">
                                         </div>
                                     </td>
                                 </tr>
                                 </tbody>
                             </table>
                             <span th:if="${totalPages > 0}">Showing [[${pageSize * (currentPage - 1) + 1}]] to [[${pageSize * (currentPage - 1) + pageSize}]] of Total [[${totalItems}]] Entries</span>
-                            <div th:replace="~{fragments/paging :: industrialZonePagination}"></div>
+                            <div th:replace="~{fragments/paging :: companyPagination}"></div>
                         </div>
                     </div>
                 </div>
@@ -142,17 +163,21 @@
             var citySearch = document.querySelector("#citySearch");
             var townshipName = document.querySelector("#townshipName");
             var townshipSearch = document.querySelector("#townshipSearch");
+            var industrialZoneName = document.querySelector("#industrialZoneName");
+            var industrialZoneSearch = document.querySelector("#industrialZoneSearch");
             dselect(cityName, {search: true});
             dselect(citySearch, {search: true});
             dselect(townshipName, {search: true});
             dselect(townshipSearch, {search: true});
+            dselect(industrialZoneName, {search: true});
+            dselect(industrialZoneSearch, {search: true});
         <!-- End -->
 
-        <!-- When page is returned with error message for automatically choosing select box -->
+        <!-- When page is returned with error message for automatically choosing select boxes -->
             var city_name = $("#cityName option:selected").val();
             setTimeout(function() {
                 $.ajax({
-                    url: "/api/industrialZone/cityToTownship",
+                    url: "/api/company/cityToTownship",
                     type: "POST",
                     data: {
                         "cityName" : city_name
@@ -167,11 +192,34 @@
 
                             dselect(townshipName, {search: true});
                             $("#submitForm .row #township-select .dselect-wrapper .dropdown-menu .d-flex .dselect-items button:contains(" + [[${township_select}]] + ")").click();
-                            $("#industrialZoneName").focus();
                         }
+
+                        setTimeout(function() {
+                            $.ajax({
+                                url: "/api/company/townshipToIndustrialZone",
+                                type: "POST",
+                                data: {
+                                    "townshipName" : [[${township_select}]]
+                                },
+                                success: function(data) {
+                                    $("#industrialZoneName option[value!='']").remove();
+
+                                    if(data.length != 0) {
+                                        for(var i = 0; i < data.length; i++) {
+                                            $("#industrialZoneName").append(`<option value="${data[i].name}">${data[i].name}</option>`);
+                                        }
+
+                                        dselect(industrialZoneName, {search: true});
+                                        $("#submitForm .row #industrial-zone-select .dselect-wrapper .dropdown-menu .d-flex .dselect-items button:contains(" + [[${industrial_zone_select}]] + ")").click();
+                                        $("#companyName").focus();
+                                    }
+                                }
+                            });
+                        }, 100);
                     }
                 });
             }, 100);
+
         <!-- End -->
 
         <!-- Alert Boxes -->
@@ -190,28 +238,25 @@
                 });
             }
 
-            if([[${deleted_success}]]) {
+            if([[${active_status_success}]]) {
                 iziToast.success({
-                    color: 'red',
-                    message: 'Successfully Deleted!',
+                    message: 'This company is active now!',
                     position: 'topCenter'
                 });
             }
 
-            if([[${deleted_fail}]]) {
-               iziToast.error({
-                    color: 'red',
-                    title: 'Failed!',
-                    message: 'Please delete all companies included in this industrial zone at first.',
+            if([[${inactive_status_success}]]) {
+                iziToast.warning({
+                    message: 'This company is inactive now!',
                     position: 'topCenter'
                 });
             }
 
-            if([[${industrial_zone_not_found}]]) {
+            if([[${company_not_found}]]) {
                 iziToast.error({
                     color: 'red',
                     title: 'Failed!',
-                    message: 'This industrial zone is not found!',
+                    message: 'This company is not found!',
                     position: 'topCenter'
                 });
             }
@@ -230,7 +275,7 @@
                         yes: {
                             btnClass: 'btn-success',
                             action: function () {
-                                $("#submitForm").prop("action", "/api/industrialZone/add");
+                                $("#submitForm").prop("action", "/api/company/add");
                                 $("#submitForm").submit();
                             }
                         },
@@ -244,16 +289,17 @@
             $(document).delegate(".btn-edit", "click", function(event) {
                 var parent = $(this).parent().parent().parent();
                 var id = parent.children("td:nth-child(1)").html();
-                var industrial_zone_name = parent.children("td:nth-child(3)").html();
+                var company_name = parent.children("td:nth-child(3)").html();
                 var city_name = parent.children("td:nth-child(4)").html();
                 var township_name = parent.children("td:nth-child(5)").html();
+                var industrial_zone_name = parent.children("td:nth-child(6)").html();
 
-                $("#industrialZoneName").val(industrial_zone_name);
+                $("#companyName").val(company_name);
                 $("#submitForm .row #city-select .dselect-wrapper .dropdown-menu .d-flex .dselect-items button:contains(" + city_name + ")").click();
 
                 setTimeout(function() {
                     $.ajax({
-                        url: "/api/industrialZone/cityToTownship",
+                        url: "/api/company/cityToTownship",
                         type: "POST",
                         data: {
                             "cityName" : city_name
@@ -268,8 +314,30 @@
 
                                 dselect(townshipName, {search: true});
                                 $("#submitForm .row #township-select .dselect-wrapper .dropdown-menu .d-flex .dselect-items button:contains(" + township_name + ")").click();
-                                $("#industrialZoneName").focus();
                             }
+
+                            setTimeout(function() {
+                                $.ajax({
+                                    url: "/api/company/townshipToIndustrialZone",
+                                    type: "POST",
+                                    data: {
+                                        "townshipName" : township_name
+                                    },
+                                    success: function(data) {
+                                        $("#industrialZoneName option[value!='']").remove();
+
+                                        if(data.length != 0) {
+                                            for(var i = 0; i < data.length; i++) {
+                                                $("#industrialZoneName").append(`<option value="${data[i].name}">${data[i].name}</option>`);
+                                            }
+
+                                            dselect(industrialZoneName, {search: true});
+                                            $("#submitForm .row #industrial-zone-select .dselect-wrapper .dropdown-menu .d-flex .dselect-items button:contains(" + industrial_zone_name + ")").click();
+                                            $("#companyName").focus();
+                                        }
+                                    }
+                                });
+                            }, 100);
                         }
                     });
                 }, 100);
@@ -293,7 +361,7 @@
                             btnClass: 'btn-info text-white',
                             action: function () {
                                 var id = $(".btn-update").children("span").html();
-                                $("#submitForm").prop("action", "/api/industrialZone/update/" + id);
+                                $("#submitForm").prop("action", "/api/company/update/" + id);
                                 $("#submitForm").submit();
                             }
                         },
@@ -303,34 +371,24 @@
             });
         <!-- End -->
 
-        <!-- When delete button is clicked -->
-            $(document).delegate(".btn-delete", "click", function() {
-                event.preventDefault();
+        <!-- When status button is clicked -->
+            $(document).delegate(".status", "change", function() {
                 var parent = $(this).parent().parent().parent();
                 var id = parent.children("td:nth-child(1)").html();
 
-                $.confirm({
-                    title: 'Confirm!',
-                    content: "Are you sure to delete?",
-                    type: 'red',
-                    autoClose: 'no|10000',
-                    buttons: {
-                        yes: {
-                            btnClass: 'btn-danger',
-                            action: function () {
-                                window.location = "/api/industrialZone/delete/" + id;
-                            }
-                        },
-                        no: function () {}
-                    }
-                });
+                if($(this).is(':checked')) {
+                    window.location = "/api/company/status/1/" + id;
+                }
+                else {
+                    window.location = "/api/company/status/0/" + id;
+                }
             });
         <!-- End -->
 
         <!-- When clear button is clicked -->
             $("#btnClear").on("click", function(e) {
               e.preventDefault();
-              window.location = "/api/industrialZone/";
+              window.location = "/api/company/";
             });
         <!-- End -->
 
@@ -339,7 +397,7 @@
                 var city_name = $("#cityName option:selected").text();
 
                 $.ajax({
-                    url: "/api/industrialZone/cityToTownship",
+                    url: "/api/company/cityToTownship",
                     type: "POST",
                     data: {
                         "cityName" : city_name
@@ -353,10 +411,40 @@
                             }
 
                             dselect(townshipName, {search: true});
-                            $("#industrialZoneName").focus();
                         }
                         else {
                             dselect(townshipName, {search: true});
+                            $("#industrialZoneName option[value!='']").remove();
+                            dselect(industrialZoneName, {search: true});
+                        }
+                    }
+                });
+            });
+        <!-- End -->
+
+        <!-- When township select box is changed -->
+            $("#townshipName").change(function() {
+                var township_name = $("#townshipName option:selected").text();
+
+                $.ajax({
+                    url: "/api/company/townshipToIndustrialZone",
+                    type: "POST",
+                    data: {
+                        "townshipName" : township_name
+                    },
+                    success: function(data) {
+                        $("#industrialZoneName option[value!='']").remove();
+
+                        if(data.length != 0) {
+                            for(var i = 0; i < data.length; i++) {
+                                $("#industrialZoneName").append(`<option value="${data[i].name}">${data[i].name}</option>`);
+                            }
+
+                            dselect(industrialZoneName, {search: true});
+                            $("#companyName").focus();
+                        }
+                        else {
+                            dselect(industrialZoneName, {search: true});
                         }
                     }
                 });

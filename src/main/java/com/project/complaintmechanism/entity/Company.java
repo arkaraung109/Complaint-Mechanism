@@ -21,6 +21,8 @@ public class Company {
 
     private String name;
 
+    private boolean activeStatus;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "industrial_zone_id")
     @JsonBackReference
@@ -29,9 +31,5 @@ public class Company {
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<ComplaintForm> complaintFormList;
-
-    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
-    @JsonManagedReference
-    private List<Employee> employeeList;
 
 }

@@ -18,6 +18,6 @@ public class DailyLimit {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    private Integer maxLimit;
+    private int maxLimit;
 
 }

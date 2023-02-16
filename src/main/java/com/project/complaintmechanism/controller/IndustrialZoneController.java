@@ -83,7 +83,7 @@ public class IndustrialZoneController {
             model.addAttribute("keyword", keyword);
         }
         else if(isEmptyKeyword && !isEmptyCityName && !isEmptyTownshipName) {
-            industrialZonePage = industrialZoneService.findbyPageWithCityNameAndTownshipName(cityName, townshipName, paging);
+            industrialZonePage = industrialZoneService.findByPageWithCityNameAndTownshipName(cityName, townshipName, paging);
             model.addAttribute("cityName", cityName);
             model.addAttribute("townshipName", townshipName);
         }

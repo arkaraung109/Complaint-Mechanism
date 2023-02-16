@@ -7,51 +7,61 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface IndustrialZoneRepository extends JpaRepository<IndustrialZone, Long> {
 
-    @Query(value = "select exists(select i.name from industrial_zone i, township t, city c where i.township_id=t.id and t.city_id=c.id and c.name=?1 and t.name=?2 and i.name=?3)",
+    String join_query = "select i.* from industrial_zone i, township t, city c where i.township_id=t.id and t.city_id=c.id";
+    String order_by_query = "order by i.name, c.name, t.name";
+
+    @Query(value = "select exists(" + join_query + " and c.name=?1 and t.name=?2 and i.name=?3)",
             nativeQuery = true)
     int findExistsByCityNameAndTownshipName(String cityName, String townshipName, String industrialZoneName);
 
-    @Query(value = "select i.* from industrial_zone i, township t, city c where i.township_id=t.id and t.city_id=c.id order by i.name, c.name, t.name",
-            countQuery = "select i.* from industrial_zone i, township t, city c where i.township_id=t.id and t.city_id=c.id order by i.name, c.name, t.name",
-            nativeQuery = true)
-    Page<IndustrialZone> findAllByOrderByNameAsc(Pageable paging);
+    IndustrialZone findByNameAndTownshipName(String industrialZoneName, String townshipName);
 
-    @Query(value = "select i.* from industrial_zone i, township t, city c where i.township_id=t.id and t.city_id=c.id and i.name like ?1% order by i.name, c.name, t.name",
-            countQuery = "select i.* from industrial_zone i, township t, city c where i.township_id=t.id and t.city_id=c.id and i.name like ?1% order by i.name, c.name, t.name",
-            nativeQuery = true)
-    Page<IndustrialZone> findByNameStartingWithIgnoreCaseOrderByNameAsc(String keyword, Pageable paging);
+    List<IndustrialZone> findByTownshipName(String townshipName);
 
-    @Query(value = "select i.* from industrial_zone i, township t, city c where i.township_id=t.id and t.city_id=c.id and c.name=?1 order by i.name, c.name, t.name",
-            countQuery = "select i.* from industrial_zone i, township t, city c where i.township_id=t.id and t.city_id=c.id and c.name=?1 order by i.name, c.name, t.name",
-            nativeQuery = true)
-    Page<IndustrialZone> findByCityNameOrderByNameAsc(String cityName, Pageable paging);
+    List<IndustrialZone> findAllByOrderByNameAsc();
 
-    @Query(value = "select i.* from industrial_zone i, township t, city c where i.township_id=t.id and t.city_id=c.id and t.name=?1 order by i.name, c.name, t.name",
-            countQuery = "select i.* from industrial_zone i, township t, city c where i.township_id=t.id and t.city_id=c.id and t.name=?1 order by i.name, c.name, t.name",
+    @Query(value = join_query + " " + order_by_query,
+            countQuery = join_query + " " + order_by_query,
             nativeQuery = true)
-    Page<IndustrialZone> findByTownshipNameOrderByNameAsc(String townshipName, Pageable paging);
+    Page<IndustrialZone> findByPage(Pageable paging);
 
-    @Query(value = "select i.* from industrial_zone i, township t, city c where i.township_id=t.id and t.city_id=c.id and i.name like ?1% and c.name=?2 order by i.name, c.name, t.name",
-            countQuery = "select i.* from industrial_zone i, township t, city c where i.township_id=t.id and t.city_id=c.id and i.name like ?1% and c.name=?2 order by i.name, c.name, t.name",
+    @Query(value = join_query + " and i.name like ?1% " + order_by_query,
+            countQuery = join_query + " and i.name like ?1% " + order_by_query,
             nativeQuery = true)
-    Page<IndustrialZone> findByNameStartingWithIgnoreCaseAndCityNameOrderByNameAsc(String keyword, String cityName, Pageable paging);
+    Page<IndustrialZone> findByPageWithIndustrialZoneName(String keyword, Pageable paging);
 
-    @Query(value = "select i.* from industrial_zone i, township t, city c where i.township_id=t.id and t.city_id=c.id and i.name like ?1% and t.name=?2 order by i.name, c.name, t.name",
-            countQuery = "select i.* from industrial_zone i, township t, city c where i.township_id=t.id and t.city_id=c.id and i.name like ?1% and t.name=?2 order by i.name, c.name, t.name",
+    @Query(value = join_query + " and c.name=?1 " + order_by_query,
+            countQuery = join_query + " and c.name=?1 " + order_by_query,
             nativeQuery = true)
-    Page<IndustrialZone> findByNameStartingWithIgnoreCaseAndTownshipNameOrderByNameAsc(String keyword, String townshipName, Pageable paging);
+    Page<IndustrialZone> findByPageWithCityName(String cityName, Pageable paging);
 
-    @Query(value = "select i.* from industrial_zone i, township t, city c where i.township_id=t.id and t.city_id=c.id and c.name=?1 and t.name=?2 order by i.name, c.name, t.name",
-            countQuery = "select i.* from industrial_zone i, township t, city c where i.township_id=t.id and t.city_id=c.id and c.name=?1 and t.name=?2 order by i.name, c.name, t.name",
+    @Query(value = join_query + " and t.name=?1 " + order_by_query,
+            countQuery = join_query + " and t.name=?1 " + order_by_query,
             nativeQuery = true)
-    Page<IndustrialZone> findByCityNameAndTownshipNameOrderByNameAsc(String cityName, String townshipName, Pageable paging);
+    Page<IndustrialZone> findByPageWithTownshipName(String townshipName, Pageable paging);
 
-    @Query(value = "select i.* from industrial_zone i, township t, city c where i.township_id=t.id and t.city_id=c.id and i.name like ?1% and c.name=?2 and t.name=?3 order by i.name, c.name, t.name",
-            countQuery = "select i.* from industrial_zone i, township t, city c where i.township_id=t.id and t.city_id=c.id and i.name like ?1% and c.name=?2 and t.name=?3 order by i.name, c.name, t.name",
+    @Query(value = join_query + " and c.name=?1 and i.name like ?2% " + order_by_query,
+            countQuery = join_query + " and c.name=?1 and i.name like ?2% " + order_by_query,
             nativeQuery = true)
-    Page<IndustrialZone> findByNameStartingWithIgnoreCaseAndCityNameAndTownshipNameOrderByNameAsc(String keyword, String cityName, String townshipName, Pageable paging);
+    Page<IndustrialZone> findByPageWithCityNameAndIndustrialZoneName(String cityName, String keyword, Pageable paging);
 
+    @Query(value = join_query + " and t.name=?1 and i.name like ?2% " + order_by_query,
+            countQuery = join_query + " and t.name=?1 and i.name like ?2% " + order_by_query,
+            nativeQuery = true)
+    Page<IndustrialZone> findByPageWithTownshipNameAndIndustrialZoneName(String townshipName, String keyword, Pageable paging);
+
+    @Query(value = join_query + " and c.name=?1 and t.name=?2 " + order_by_query,
+            countQuery = join_query + " and c.name=?1 and t.name=?2 " + order_by_query,
+            nativeQuery = true)
+    Page<IndustrialZone> findByPageWithCityNameAndTownshipName(String cityName, String townshipName, Pageable paging);
+
+    @Query(value = join_query + " and c.name=?1 and t.name=?2 and i.name like ?3% " + order_by_query,
+            countQuery = join_query + " and c.name=?1 and t.name=?2 and i.name like ?3% " + order_by_query,
+            nativeQuery = true)
+    Page<IndustrialZone> findByPageWithCityNameAndTownshipNameAndIndustrialZoneName(String cityName, String townshipName, String keyword, Pageable paging);
 }
