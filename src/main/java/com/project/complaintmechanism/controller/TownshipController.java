@@ -1,6 +1,5 @@
 package com.project.complaintmechanism.controller;
 
-import com.project.complaintmechanism.entity.City;
 import com.project.complaintmechanism.entity.IndustrialZone;
 import com.project.complaintmechanism.entity.Township;
 import com.project.complaintmechanism.model.TownshipModel;
@@ -73,9 +72,9 @@ public class TownshipController {
         }
 
         List<Township> townshipList = townshipPage.getContent();
-        List<City> cityList = cityService.findAll();
+        List<String> cityNameList = cityService.findAllNames();
         model.addAttribute("townshipList", townshipList);
-        model.addAttribute("cityList", cityList);
+        model.addAttribute("cityNameList", cityNameList);
         model.addAttribute("currentPage", townshipPage.getNumber() + 1);
         model.addAttribute("totalItems", townshipPage.getTotalElements());
         model.addAttribute("totalPages", townshipPage.getTotalPages());
@@ -125,13 +124,12 @@ public class TownshipController {
         if(township.isPresent()) {
             List<IndustrialZone> industrialZoneList = township.get().getIndustrialZoneList();
 
-            if(industrialZoneList.isEmpty()) {
-                townshipService.deleteById(id);
-                redirectAttributes.addFlashAttribute("deleted_success", true);
+            if(!industrialZoneList.isEmpty()) {
+                industrialZoneService.deleteTownshipByTownshipId(id);
             }
-            else {
-                redirectAttributes.addFlashAttribute("deleted_fail", true);
-            }
+
+            townshipService.deleteById(id);
+            redirectAttributes.addFlashAttribute("deleted_success", true);
         }
         else {
             redirectAttributes.addFlashAttribute("township_not_found", true);

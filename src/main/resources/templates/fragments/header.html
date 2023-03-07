@@ -5,7 +5,6 @@
 </head>
 <body>
     <div th:fragment="header">
-        <!-- ======= Header ======= -->
         <header id="header" class="header fixed-top d-flex align-items-center">
             <div class="d-flex align-items-center justify-content-between">
                 <a th:href="@{/}" class="logo d-flex align-items-center">
@@ -14,16 +13,12 @@
                 </a>
                 <i class="fa-solid fa-bars toggle-sidebar-btn"></i>
             </div>
-            <!-- End Logo -->
-
             <nav class="header-nav ms-auto">
                 <ul class="d-flex align-items-center">
                     <li class="nav-item dropdown pe-3">
                         <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
                             <img th:src="@{/img/profile-img1.jpg}" alt="Profile" class="rounded-circle">
                         </a>
-                        <!-- End Profile Image Icon -->
-
                         <ul	class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                             <li class="dropdown-header">
                                 <h6>Admin</h6>
@@ -31,7 +26,7 @@
                             <li>
                                 <a class="dropdown-item d-flex align-items-center" href="">
                                     <i class="fa-solid fa-user"></i>
-                                    <span class="mx-2">Change Password</span>
+                                    <span class="ms-2">Change Password</span>
                                 </a>
                             </li>
                             <li>
@@ -40,69 +35,58 @@
                             <li>
                                 <a class="dropdown-item d-flex align-items-center" href="#">
                                     <i class="fa-solid fa-arrow-right"></i>
-                                    <span class="mx-2">Sign Out</span>
+                                    <span class="ms-2">Sign Out</span>
                                 </a>
                             </li>
                         </ul>
-                        <!-- End Profile Dropdown Items -->
-
                     </li>
-                    <!-- End Profile Nav -->
-
                 </ul>
             </nav>
-            <!-- End Icons Navigation -->
-
         </header>
-        <!-- End Header -->
-
-        <!-- ======= Sidebar ======= -->
         <aside id="sidebar" class="sidebar">
             <ul class="sidebar-nav" id="sidebar-nav">
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/}">
                         <i class="fa-solid fa-house"></i>
-                        <span class="mx-1">Welcome</span>
+                        <span class="ms-1">Welcome</span>
                     </a>
                 </li>
-                <!-- End Dashboard Nav -->
-
                 <li class="nav-item">
                     <a class="nav-link collapsed" data-bs-target="#components-nav" data-bs-toggle="collapse" href="#">
                         <i class="fa-solid fa-chevron-right"></i>
-                        <span class="mx-2">Master Setting</span>
+                        <span class="ms-2">Master Setting</span>
                         <i class="fa-solid fa-chevron-down ms-auto"></i>
                     </a>
                     <ul id="components-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
-                        <li><a th:href="@{/api/city/}"><i class="fa-solid fa-chevron-right"></i><span class="mx-2">City</span></a></li>
-                        <li><a th:href="@{/api/township/}"><i class="fa-solid fa-chevron-right"></i><span class="mx-2">Township</span></a></li>
-                        <li><a th:href="@{/api/industrialZone/}"><i class="fa-solid fa-chevron-right"></i><span class="mx-2">Industrial Zone</span></a></li>
-                        <li><a th:href="@{/api/company/}"><i class="fa-solid fa-chevron-right"></i><span class="mx-2">Company</span></a></li>
-                        <li><a th:href="@{/api/complaintTitle/}"><i class="fa-solid fa-chevron-right"></i><span class="mx-2">Complaint Title</span></a></li>
+                        <li><a th:href="@{/api/city/}"><i class="fa-solid fa-chevron-right"></i><span class="ms-2">City</span></a></li>
+                        <li><a th:href="@{/api/township/}"><i class="fa-solid fa-chevron-right"></i><span class="ms-2">Township</span></a></li>
+                        <li><a th:href="@{/api/industrialZone/}"><i class="fa-solid fa-chevron-right"></i><span class="ms-2">Industrial Zone</span></a></li>
+                        <li><a th:href="@{/api/company/}"><i class="fa-solid fa-chevron-right"></i><span class="ms-2">Company</span></a></li>
                     </ul>
                 </li>
-                <!-- End Components Nav -->
-
                 <li class="nav-item">
                     <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
                         <i class="fa-solid fa-chevron-right"></i>
-                        <span class="mx-2">Complaint List</span>
+                        <span class="ms-2">Complaint Setting</span>
                         <i class="fa-solid fa-chevron-down ms-auto"></i>
                     </a>
                     <ul id="forms-nav" class="nav-content collapse"	data-bs-parent="#sidebar-nav">
                         <li>
-                            <a href="">
+                            <a th:href="@{/api/complaintTitle/}">
                                 <i class="fa-solid fa-chevron-right"></i>
-                                <span class="mx-2">Complaint List</span>
+                                <span class="ms-2">Complaint Title</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a th:href="@{/api/complaint/}">
+                                <i class="fa-solid fa-chevron-right"></i>
+                                <span class="ms-2">Complaint List</span>
                             </a>
                         </li>
                     </ul>
                 </li>
-                <!-- End Forms Nav -->
-
             </ul>
         </aside>
-        <!-- End Sidebar-->
     </div>
 </body>
 </html>

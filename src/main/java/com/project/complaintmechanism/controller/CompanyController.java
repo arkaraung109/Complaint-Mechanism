@@ -1,6 +1,5 @@
 package com.project.complaintmechanism.controller;
 
-import com.project.complaintmechanism.entity.City;
 import com.project.complaintmechanism.entity.Company;
 import com.project.complaintmechanism.entity.IndustrialZone;
 import com.project.complaintmechanism.entity.Township;
@@ -142,12 +141,12 @@ public class CompanyController {
         }
 
         List<Company> companyList = companyPage.getContent();
-        List<City> cityList = cityService.findAll();
-        List<Township> townshipList = townshipService.findAll();
-        List<IndustrialZone> industrialZoneList = industrialZoneService.findAll();
-        model.addAttribute("cityList", cityList);
-        model.addAttribute("townshipList", townshipList);
-        model.addAttribute("industrialZoneList", industrialZoneList);
+        List<String> cityNameList = cityService.findAllNames();
+        List<String> townshipNameList = townshipService.findAllNames();
+        List<String> industrialZoneNameList = industrialZoneService.findAllNames();
+        model.addAttribute("cityNameList", cityNameList);
+        model.addAttribute("townshipNameList", townshipNameList);
+        model.addAttribute("industrialZoneNameList", industrialZoneNameList);
         model.addAttribute("companyList", companyList);
         model.addAttribute("currentPage", companyPage.getNumber() + 1);
         model.addAttribute("totalItems", companyPage.getTotalElements());
@@ -218,13 +217,14 @@ public class CompanyController {
         Optional<Company> company = companyService.findById(id);
 
         if(company.isPresent()) {
-                companyService.changeStatus(status, id);
-                if(status) {
-                    redirectAttributes.addFlashAttribute("active_status_success", true);
-                }
-                else {
-                    redirectAttributes.addFlashAttribute("inactive_status_success", true);
-                }
+            companyService.changeStatus(status, id);
+
+            if(status) {
+                redirectAttributes.addFlashAttribute("active_status_success", true);
+            }
+            else {
+                redirectAttributes.addFlashAttribute("inactive_status_success", true);
+            }
         }
         else {
             redirectAttributes.addFlashAttribute("company_not_found", true);

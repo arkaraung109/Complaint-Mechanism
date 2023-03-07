@@ -16,7 +16,9 @@ public interface IndustrialZoneService {
 
     List<IndustrialZone> findByTownshipName(String townshipName);
 
-    List<IndustrialZone> findAll();
+    List<IndustrialZone> findByCityNameAndTownshipName(String cityName, String townshipName);
+
+    List<String> findAllNames();
 
     Page<IndustrialZone> findByPage(Pageable paging);
 
@@ -37,5 +39,7 @@ public interface IndustrialZoneService {
     void saveOrUpdate(IndustrialZoneModel industrialZoneModel);
 
     void deleteById(long id);
+
+    void deleteTownshipByTownshipId(long id);
 
 }

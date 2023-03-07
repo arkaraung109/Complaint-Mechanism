@@ -16,7 +16,7 @@ public interface TownshipService {
 
     List<Township> findByCityName(String cityName);
 
-    List<Township> findAll();
+    List<String> findAllNames();
 
     Page<Township> findByPage(Pageable paging);
 
@@ -29,5 +29,7 @@ public interface TownshipService {
     void saveOrUpdate(TownshipModel townshipModel);
 
     void deleteById(long id);
+
+    void deleteCityByCityId(long id);
 
 }

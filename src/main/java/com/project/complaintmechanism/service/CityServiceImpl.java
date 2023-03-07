@@ -18,13 +18,13 @@ public class CityServiceImpl implements CityService {
     CityRepository cityRepository;
 
     @Override
-    public boolean existsByName(String name) {
-        return cityRepository.existsByName(name);
+    public boolean existsByName(String cityName) {
+        return cityRepository.existsByName(cityName);
     }
 
     @Override
-    public List<City> findAll() {
-        return cityRepository.findAllByOrderByNameAsc();
+    public List<String> findAllNames() {
+        return cityRepository.findAllDistinctNameByOrderByNameAsc();
     }
 
     @Override
@@ -38,8 +38,8 @@ public class CityServiceImpl implements CityService {
     }
 
     @Override
-    public Page<City> findByPageWithCityName(String cityName, Pageable paging) {
-        return cityRepository.findByNameStartingWithIgnoreCaseOrderByNameAsc(cityName, paging);
+    public Page<City> findByPageWithCityName(String keyword, Pageable paging) {
+        return cityRepository.findByNameStartingWithIgnoreCaseOrderByNameAsc(keyword, paging);
     }
 
     @Override

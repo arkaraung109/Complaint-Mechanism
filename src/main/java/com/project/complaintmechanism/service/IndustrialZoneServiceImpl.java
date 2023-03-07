@@ -1,8 +1,10 @@
 package com.project.complaintmechanism.service;
 
+import com.project.complaintmechanism.entity.City;
 import com.project.complaintmechanism.entity.IndustrialZone;
 import com.project.complaintmechanism.entity.Township;
 import com.project.complaintmechanism.model.IndustrialZoneModel;
+import com.project.complaintmechanism.repository.CityRepository;
 import com.project.complaintmechanism.repository.IndustrialZoneRepository;
 import com.project.complaintmechanism.repository.TownshipRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,8 @@ public class IndustrialZoneServiceImpl implements IndustrialZoneService {
     TownshipRepository townshipRepository;
     @Autowired
     IndustrialZoneRepository industrialZoneRepository;
+    @Autowired
+    private CityRepository cityRepository;
 
     @Override
     public boolean findExistsByCityNameAndTownshipName(String cityName, String townshipName, String industrialZoneName) {
@@ -33,12 +37,17 @@ public class IndustrialZoneServiceImpl implements IndustrialZoneService {
 
     @Override
     public List<IndustrialZone> findByTownshipName(String townshipName) {
-        return industrialZoneRepository.findByTownshipName(townshipName);
+        return industrialZoneRepository.findByTownshipNameOrderByNameAsc(townshipName);
     }
 
     @Override
-    public List<IndustrialZone> findAll() {
-        return industrialZoneRepository.findAllByOrderByNameAsc();
+    public List<IndustrialZone> findByCityNameAndTownshipName(String cityName, String townshipName) {
+        return industrialZoneRepository.findByCityNameAndTownshipName(cityName, townshipName);
+    }
+
+    @Override
+    public List<String> findAllNames() {
+        return industrialZoneRepository.findAllDistinctNameByOrderByNameAsc();
     }
 
     @Override
@@ -83,9 +92,14 @@ public class IndustrialZoneServiceImpl implements IndustrialZoneService {
 
     @Override
     public void saveOrUpdate(IndustrialZoneModel industrialZoneModel) {
+        City city = City.builder()
+                        .id(cityRepository.findByName(industrialZoneModel.getCityName()).getId())
+                        .name(industrialZoneModel.getCityName())
+                        .build();
         Township township = Township.builder()
                                     .id(townshipRepository.findByNameAndCityName(industrialZoneModel.getTownshipName(), industrialZoneModel.getCityName()).getId())
                                     .name(industrialZoneModel.getTownshipName())
+                                    .city(city)
                                     .build();
 
         IndustrialZone industrialZone = IndustrialZone.builder()
@@ -99,6 +113,11 @@ public class IndustrialZoneServiceImpl implements IndustrialZoneService {
     @Override
     public void deleteById(long id) {
         industrialZoneRepository.deleteById(id);
+    }
+
+    @Override
+    public void deleteTownshipByTownshipId(long id) {
+        industrialZoneRepository.deleteTownshipByTownshipId(id);
     }
 
 }

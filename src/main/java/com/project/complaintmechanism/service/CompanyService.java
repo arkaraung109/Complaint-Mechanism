@@ -5,12 +5,19 @@ import com.project.complaintmechanism.model.CompanyModel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface CompanyService {
     boolean findExistsByCityNameAndTownshipNameAndIndustrialZoneName(String cityName, String townshipName, String industrialZoneName, String companyName);
 
     Optional<Company> findById(long id);
+
+    List<Company> findByIndustrialZoneName(String industrialZoneName);
+
+    List<Company> findByCityNameAndTownshipNameAndIndustrialZoneName(String cityName, String townshipName, String industrialZoneName);
+
+    List<String> findAllNames();
 
     Page<Company> findByPage(Pageable paging);
 
@@ -45,4 +52,6 @@ public interface CompanyService {
     void saveOrUpdate(CompanyModel companyModel);
 
     void changeStatus(boolean status, long id);
+
+    void deleteCompanyByCompanyId(long id);
 }

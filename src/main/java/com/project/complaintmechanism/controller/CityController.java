@@ -4,6 +4,7 @@ import com.project.complaintmechanism.entity.City;
 import com.project.complaintmechanism.entity.Township;
 import com.project.complaintmechanism.model.CityModel;
 import com.project.complaintmechanism.service.CityService;
+import com.project.complaintmechanism.service.TownshipService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,6 +25,8 @@ public class CityController {
 
     @Autowired
     CityService cityService;
+    @Autowired
+    TownshipService townshipService;
 
     @GetMapping("/")
     public String showList(Model model) {
@@ -106,13 +109,12 @@ public class CityController {
         if(city.isPresent()) {
             List<Township> townshipList = city.get().getTownshipList();
 
-            if(townshipList.isEmpty()) {
-                cityService.deleteById(id);
-                redirectAttributes.addFlashAttribute("deleted_success", true);
+            if(!townshipList.isEmpty()) {
+                townshipService.deleteCityByCityId(id);
             }
-            else {
-                redirectAttributes.addFlashAttribute("deleted_fail", true);
-            }
+
+            cityService.deleteById(id);
+            redirectAttributes.addFlashAttribute("deleted_success", true);
         }
         else {
             redirectAttributes.addFlashAttribute("city_not_found", true);

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Complaint Form</title>
+    <div th:replace="~{fragments/include :: include}"></div>
+    <script th:src="@{/js/main.js}"></script>
+</head>
+<body>
+    <th:block th:if="${added_success}">
+        <<div class="container mt-4">
+        <div class="d-flex justify-content-center">
+            <div class="card w-50">
+                <div class="card-body">
+                    <h5 class="card-title">About Complaint Form Submission</h5>
+                    <p class="card-text">The form is submitted successfully!</p>
+                    <p class="card-text">We really appreciate your complaints and will take care of yours!</p>
+                    <a th:href="@{/api/complaintForm/}" class="card-link">Submit Another Response</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    </th:block>
+    <th:block th:if="${exceeded}">
+        <div class="container mt-4">
+            <div class="d-flex justify-content-center">
+                <div class="card w-50">
+                    <div class="card-body">
+                        <h5 class="card-title">About Complaint Form Submission</h5>
+                        <p class="card-text">Sorry, the number of complaint forms is reached the limit we accept daily.</p>
+                        <p class="card-text">Please try again tomorrow.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </th:block>
+</body>
+</html>

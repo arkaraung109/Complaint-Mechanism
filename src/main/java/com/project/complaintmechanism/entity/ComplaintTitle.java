@@ -21,7 +21,9 @@ public class ComplaintTitle {
 
     private String name;
 
-    @ManyToMany(mappedBy = "complaintTitleSet", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "complaintTitleSet", fetch = FetchType.LAZY, cascade = {
+            CascadeType.MERGE
+    })
     @JsonBackReference
     private Set<ComplaintForm> complaintFormSet = new HashSet<>();
 

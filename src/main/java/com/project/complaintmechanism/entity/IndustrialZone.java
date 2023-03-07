@@ -21,12 +21,12 @@ public class IndustrialZone {
 
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     @JoinColumn(name = "township_id")
     @JsonBackReference
     private Township township;
 
-    @OneToMany(mappedBy = "industrialZone", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "industrialZone")
     @JsonManagedReference
     private List<Company> companyList;
 

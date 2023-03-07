@@ -28,8 +28,20 @@
         [[${label}]]
     </a>
 
+    <a th:fragment="complaintTitlePaging(pageNum, label, tooltip)" class="page-link"
+       th:href="@{'/api/complaintTitle/page?' + ${keyword!=null && keyword!='' ? 'keyword=' + keyword + '&' : ''} + 'page=' + ${pageNum} + '&size=' + ${pageSize}}"
+       th:title="${tooltip}" rel="tooltip">
+        [[${label}]]
+    </a>
+
+    <a th:fragment="complaintPaging(pageNum, label, tooltip)" class="page-link"
+       th:href="@{'/api/complaint/page?' + ${companyName!=null && companyName!='' ? 'companyName=' + companyName + '&' : ''} + '' + ${complaintTitleName!=null && complaintTitleName!='' ? 'complaintTitleName=' + complaintTitleName + '&' : ''} + '' + ${date!=null && date!='' ? 'date=' + date + '&' : ''}  + 'page=' + ${pageNum} + '&size=' + ${pageSize}}"
+       th:title="${tooltip}" rel="tooltip">
+        [[${label}]]
+    </a>
+
     <nav aria-label="Pagination" th:if="${totalPages > 0}" th:fragment="cityPagination">
-        <ul class="pagination justify-content-center">
+        <ul class="pagination justify-content-end">
             <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
                 <a th:replace="~{fragments/paging :: cityPaging(1, '<<', 'First Page')}"></a>
             </li>
@@ -56,7 +68,7 @@
     </nav>
 
     <nav aria-label="Pagination" th:if="${totalPages > 0}" th:fragment="townshipPagination">
-        <ul class="pagination justify-content-center">
+        <ul class="pagination justify-content-end">
             <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
                 <a th:replace="~{fragments/paging :: townshipPaging(1, '<<', 'First Page')}"></a>
             </li>
@@ -83,7 +95,7 @@
     </nav>
 
     <nav aria-label="Pagination" th:if="${totalPages > 0}" th:fragment="industrialZonePagination">
-        <ul class="pagination justify-content-center">
+        <ul class="pagination justify-content-end">
             <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
                 <a th:replace="~{fragments/paging :: industrialZonePaging(1, '<<', 'First Page')}"></a>
             </li>
@@ -110,7 +122,7 @@
     </nav>
 
     <nav aria-label="Pagination" th:if="${totalPages > 0}" th:fragment="companyPagination">
-        <ul class="pagination justify-content-center">
+        <ul class="pagination justify-content-end">
             <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
                 <a th:replace="~{fragments/paging :: companyPaging(1, '<<', 'First Page')}"></a>
             </li>
@@ -132,6 +144,60 @@
             </li>
             <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
                 <a th:replace="~{fragments/paging :: companyPaging(${totalPages}, '>>', 'Last Page')}"></a>
+            </li>
+        </ul>
+    </nav>
+
+    <nav aria-label="Pagination" th:if="${totalPages > 0}" th:fragment="complaintTitlePagination">
+        <ul class="pagination justify-content-end">
+            <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                <a th:replace="~{fragments/paging :: complaintTitlePaging(1, '<<', 'First Page')}"></a>
+            </li>
+            <li class="page-item font-weight-bold" th:classappend="${currentPage == 1} ? 'disabled'">
+                <a th:replace="~{fragments/paging :: complaintTitlePaging(${currentPage - 1}, 'Prev', 'Previous Page')}"></a>
+            </li>
+            <li class="page-item disabled" th:if="${currentPage - 2 > 1}">
+                <a class="page-link" href="#">...</a>
+            </li>
+            <li class="page-item" th:classappend="${page == currentPage} ? 'active'"
+                th:each="page : ${#numbers.sequence(currentPage > 2 ? currentPage - 2 : 1, currentPage + 2 < totalPages ? currentPage + 2 : totalPages)}">
+                <a th:replace="~{fragments/paging :: complaintTitlePaging(${page}, ${page}, 'Page ' + ${page})}"></a>
+            </li>
+            <li class="page-item disabled" th:if="${currentPage + 2 < totalPages}">
+                <a class="page-link" href="#">...</a>
+            </li>
+            <li class="page-item font-weight-bold" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                <a th:replace="~{fragments/paging :: complaintTitlePaging(${currentPage + 1},'Next', 'Next Page')}"></a>
+            </li>
+            <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                <a th:replace="~{fragments/paging :: complaintTitlePaging(${totalPages}, '>>', 'Last Page')}"></a>
+            </li>
+        </ul>
+    </nav>
+
+    <nav aria-label="Pagination" th:if="${totalPages > 0}" th:fragment="complaintPagination">
+        <ul class="pagination justify-content-end">
+            <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                <a th:replace="~{fragments/paging :: complaintPaging(1, '<<', 'First Page')}"></a>
+            </li>
+            <li class="page-item font-weight-bold" th:classappend="${currentPage == 1} ? 'disabled'">
+                <a th:replace="~{fragments/paging :: complaintPaging(${currentPage - 1}, 'Prev', 'Previous Page')}"></a>
+            </li>
+            <li class="page-item disabled" th:if="${currentPage - 2 > 1}">
+                <a class="page-link" href="#">...</a>
+            </li>
+            <li class="page-item" th:classappend="${page == currentPage} ? 'active'"
+                th:each="page : ${#numbers.sequence(currentPage > 2 ? currentPage - 2 : 1, currentPage + 2 < totalPages ? currentPage + 2 : totalPages)}">
+                <a th:replace="~{fragments/paging :: complaintPaging(${page}, ${page}, 'Page ' + ${page})}"></a>
+            </li>
+            <li class="page-item disabled" th:if="${currentPage + 2 < totalPages}">
+                <a class="page-link" href="#">...</a>
+            </li>
+            <li class="page-item font-weight-bold" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                <a th:replace="~{fragments/paging :: complaintPaging(${currentPage + 1},'Next', 'Next Page')}"></a>
+            </li>
+            <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                <a th:replace="~{fragments/paging :: complaintPaging(${totalPages}, '>>', 'Last Page')}"></a>
             </li>
         </ul>
     </nav>

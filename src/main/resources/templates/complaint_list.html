@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Complaint List</title>
+    <div th:replace="~{fragments/include :: include}"></div>
+    <script th:src="@{/js/main.js}"></script>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+    <main id="main" class="main">
+        <div class="pagetitle">
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a th:href="@{/}"><i class="fa-solid fa-house"></i><span class="ms-1">Welcome</span></a></li>
+                    <li class="breadcrumb-item"><a th:href="@{/api/complaint/}">Complaint List</a></li>
+                </ol>
+            </nav>
+        </div>
+        <section class="section">
+            <div class="card">
+                <div class="card-body">
+                    <form th:action="@{/api/complaint/dailyLimit/update}" method="POST" id="dailyLimitForm" th:object="${dailyLimit}" class="mt-4">
+                        <div class="row">
+                            <label for="dailyLimit" class="form-label mt-1 col-auto">Maximum Daily Limit of Complaints:</label>
+                            <input type="number" th:field="*{maxLimit}" class="w-auto col-auto form-control" id="dailyLimit" min="1" max="1000" size="3">
+                            <button type="submit" class="btn ms-2 col-auto" style="background:#49b7bf; color:white;">Set</button>
+                            <span class="text-small text-danger" th:if="${#fields.hasErrors('maxLimit')}" th:errors="*{maxLimit}"></span>
+                        </div>
+                    </form>
+                    <hr>
+                    <h5 style="font-size: 18px; font-weight: 500; color: #012970; font-family: 'Poppins', sans-serif; margin-bottom: 15px">Searching</h5>
+                    <form th:action="@{/api/complaint/page}" id="searchForm">
+                        <div class="row mb-2">
+                            <div class="col-3">
+                                <input type="text" id="datepicker" name="date" placeholder="Search by all dates" readonly/>
+                            </div>
+                            <div class="col-3">
+                                <select class="form-select" id="companySearch" name="companyName">
+                                    <option value="" selected>Search by all companies</option>
+                                    <option th:each="c : ${companyNameList}" th:text="${c}" th:value="${c}" th:selected="${c == companyName}"></option>
+                                </select>
+                            </div>
+                            <div class="col-4">
+                                <select class="form-select" id="complaintTitleSearch" name="complaintTitleName">
+                                    <option value="" selected>Search by all complaint titles</option>
+                                    <option th:each="c : ${complaintTitleNameList}" th:text="${c}" th:value="${c}" th:selected="${c == complaintTitleName}"></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2 d-flex justify-content-end">
+                            <button type="submit" class="btn" style="background:#49b7bf; color:white;">Search</button>
+                            <button id="btn-reset" class="btn" style="background:#f56e70; color:white;">Reset</button>
+                        </div>
+                        <hr th:unless="${complaintList.isEmpty()}">
+                        <div class="float-end">
+                            <b class="form-label mt-1" th:unless="${complaintList.isEmpty()}">Number of Complaints Today:&nbsp;&nbsp;[[${complaintCount}]]</b>
+                        </div>
+                        <div class="float-end me-5">
+                            <b class="form-label mt-1">Maximum Daily Limit of Complaints:&nbsp;&nbsp;[[${limit}]]</b>
+                        </div>
+                        <h5 class="card-title" th:unless="${complaintList.isEmpty()}">Complaint List</h5>
+                        <div class="float-end mb-3" th:unless="${complaintList.isEmpty()}">
+                            <label for="pageSize" class="form-label mt-1">Entries per page:&nbsp;&nbsp;</label>
+                            <select name="size" th:value="${pageSize}" onchange="this.form.submit()" class="form-select w-auto float-end" id="pageSize">
+                                <option th:each="s : ${ {5, 10, 15, 20} }" th:value="${s}" th:text="${s}" th:selected="${s == pageSize}"></option>
+                            </select>
+                        </div>
+                    </form>
+                    <div class="btn-group dropdown" th:unless="${complaintList.isEmpty()}">
+                        <a class="btn dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">View</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item active" href="#">All</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#">Read</a></li>
+                            <li><a class="dropdown-item" href="#">Unread</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#">Accepted</a></li>
+                            <li><a class="dropdown-item" href="#">Rejected</a></li>
+                            <li><a class="dropdown-item" href="#">Unassigned</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#">Solved</a></li>
+                            <li><a class="dropdown-item" href="#">Unsolved</a></li>
+                        </ul>
+                    </div>
+                    <div class="btn-group" th:unless="${complaintList.isEmpty()}">
+                        <a class="btn dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">Action</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" id="markAsRead" style="cursor: pointer">Mark as read</a></li>
+                            <li><a class="dropdown-item" id="markAsUnread" style="cursor: pointer">Mark as unread</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#">Delete</a></li>
+                        </ul>
+                    </div>
+                    <table class="table table-borderless table-responsive table-hover" th:unless="${complaintList.isEmpty()}">
+                        <caption>Showing [[${pageSize * (currentPage - 1) + 1}]] to [[${pageSize * (currentPage - 1) + pageSize}]] of Total [[${totalItems}]] Entries</caption>
+                        <thead>
+                            <tr class="table-dark">
+                                <th style="width: 2%"><input type="checkbox" class="form-check-input check-all"/></th>
+                                <th style="width: 20%">Employee Name</th>
+                                <th style="width: 20%">Company Name</th>
+                                <th style="width: 20%">Complaint Title</th>
+                                <th style="width: 30%">Description</th>
+                                <th style="width: 8%">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <th:block th:each="complaint, state : ${complaintList}">
+                                <tr th:styleappend="${complaint.readStatus} == 'Unread' ? 'font-weight: bold' : ''" th:classappend="${complaint.readStatus} == 'Unread' ? 'shadow-sm' : 'table-secondary'" class="complaint">
+                                    <td th:text="${complaint.id}" hidden></td>
+                                    <td><input type="checkbox" class="form-check-input check" name="checkbox"></td>
+                                    <td th:text="${complaint.name}"></td>
+                                    <td th:text="${complaint.companyName}"></td>
+                                    <td th:text="${complaint.complaintTitle}"></td>
+                                    <td th:text="${complaint.description}"></td>
+                                    <td th:text="${complaint.date}"></td>
+                                </tr>
+<!--                                class="text-truncate d-inline-block" style="max-width: 200px"-->
+                            </th:block>
+                        </tbody>
+                    </table>
+                    <div th:replace="~{fragments/paging :: complaintPagination}" th:unless="${complaintList.isEmpty()}"></div>
+                </div>
+            </div>
+        </section>
+        <h4 class="text-danger" th:if="${complaintList.isEmpty()}">No record found!</h4>
+    </main>
+
+    <script th:inline="javascript">
+
+        $(document).ready(function() {
+
+        <!-- Placing value in input form of daily limit -->
+            var span = $("#dailyLimitForm .row").children("span");
+            if(!span.is('span')) {
+                $("#dailyLimit").val([[${limit}]]);
+            }
+        <!-- End -->
+
+        <!-- Search Boxes in Select Box -->
+            var companySearch = document.querySelector("#companySearch");
+            var complaintTitleSearch = document.querySelector("#complaintTitleSearch");
+
+            dselect(companySearch, {search: true});
+            dselect(complaintTitleSearch, {search: true});
+        <!-- End -->
+
+            $("#datepicker").datepicker({
+                uiLibrary: 'bootstrap5',
+                format: 'yyyy-mm-dd'
+            });
+
+            $("table").TableCheckAll();
+
+            if([[${updated_success}]]) {
+                var limit = [[${limit}]] + ' complaint form.';
+                if([[${limit}]] > 1) {
+                    limit = [[${limit}]] + ' complaint forms.';
+                }
+                iziToast.success({
+                    title: 'Done',
+                    message: 'Successfully Changed! Now you can accept up to ' + limit,
+                    position: 'topCenter'
+                });
+            }
+
+            $(document).delegate(".complaint", "click", function(event) {
+                if(event.target.tagName.toLowerCase() === "td") {
+                    var row = $(this);
+                    var id = $(this).children("td:nth-child(1)").html();
+                    if($(this).hasClass("shadow-sm")) {
+                        $.ajax({
+                            url: "/api/complaint/changeReadStatus",
+                            type: "POST",
+                            data: {
+                                "id" : id,
+                                "status" : true
+                            },
+                            success: function(data) {
+                                row.css("font-weight", "");
+                                row.removeClass("shadow-sm").addClass("table-secondary");
+                            }
+                        });
+                    }
+                }
+            });
+
+            $("#markAsRead").click(function(event) {
+                $("table tbody tr td input[name='checkbox']:checked").each(function() {
+                    var id = $(this).parent().parent().children("td:nth-child(1)").html();
+                    var row = $(this).parent().parent();
+                    $.ajax({
+                        url: "/api/complaint/changeReadStatus",
+                        type: "POST",
+                        data: {
+                            "id" : id,
+                            "status" : true
+                        },
+                        success: function(data) {
+                            row.css("font-weight", "");
+                            row.removeClass("shadow-sm").addClass("table-secondary");
+                        }
+                    });
+                });
+            });
+
+            $("#markAsUnread").click(function(event) {
+                $("table tbody tr td input[name='checkbox']:checked").each(function() {
+                    var id = $(this).parent().parent().children("td:nth-child(1)").html();
+                    var row = $(this).parent().parent();
+                    $.ajax({
+                        url: "/api/complaint/changeReadStatus",
+                        type: "POST",
+                        data: {
+                            "id" : id,
+                            "status" : false
+                        },
+                        success: function(data) {
+                            row.css("font-weight", "bold");
+                            row.removeClass("table-secondary").addClass("shadow-sm");
+                        }
+                    });
+                });
+            });
+
+        });
+
+    </script>
+</body>
+</html>

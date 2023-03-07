@@ -16,10 +16,7 @@ public class TownshipModel {
     private long id;
 
     @NotBlank(message = "Please enter township name")
-    @Pattern.List({
-            @Pattern(regexp = "^([a-zA-Z\\s]+.*$){0,100}", message = "Please enter starting with alphabet"),
-            @Pattern(regexp = "^([^<>~`!\\[\\]{}|@#^*+=:;/?%$\"\\\\]|[0-9]){0,100}$", message = "Please enter excluding special characters")
-    })
+    @Pattern(regexp = "^([^<>~`!\\[\\]{}|@#^*+=:;/?%$\"\\\\]){0,100}$", message = "Please enter excluding special characters")
     private String name;
 
     @NotBlank(message = "Please choose city name")

@@ -12,92 +12,81 @@
         <div class="pagetitle">
             <nav>
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a th:href="@{/}"><i class="fa-solid fa-house"></i><span class="mx-1">Welcome</span></a></li>
+                    <li class="breadcrumb-item"><a th:href="@{/}"><i class="fa-solid fa-house"></i><span class="ms-1">Welcome</span></a></li>
                     <li class="breadcrumb-item"><a th:href="@{/api/city/}">City</a></li>
                 </ol>
             </nav>
         </div>
-
         <section class="section">
-            <div class="row align-items-top">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">New/Update</h5>
-                            <form th:object="${city}" id="submitForm" method="POST">
-                                <div class="row mb-3">
-                                    <label for="cityName" class="col-2 col-form-label">City Name</label>
-                                    <div class="col-6">
-                                        <input type="text" class="form-control" id="cityName" th:field="*{name}">
-                                        <span class="text-small text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
-                                    </div>
-                                    <div class="col-2">
-                                        <button type="submit" class="btn btn-add" style="background:#49b7bf; color:white;">Add</button>
-                                        <button type="submit" class="btn btn-update mx-2" style="background:#49b7bf; color:white;" disabled>Update</button>
-                                    </div>
-                                </div>
-                            </form>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">New / Update</h5>
+                    <form th:object="${city}" id="submitForm" method="POST">
+                        <div class="row">
+                            <div class="col-3">
+                                <label for="cityName" class="form-label">City Name</label>
+                                <input type="text" class="form-control" id="cityName" th:field="*{name}">
+                                <span class="text-small text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+                            </div>
                         </div>
-                    </div>
+                        <div class="d-grid gap-2 d-flex justify-content-end">
+                            <button type="submit" class="btn btn-add" style="background:#49b7bf; color:white;">Add</button>
+                            <button type="submit" class="btn btn-update" style="background:#49b7bf; color:white;" disabled>Update</button>
+                        </div>
+                    </form>
                 </div>
-                <div class="col-lg-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title text-danger" th:if="${cityList.isEmpty()}">No record found!</h5>
-                            <h5 class="card-title">City List</h5>
-                            <hr>
-                            <form th:action="@{/api/city/page}" id="searchForm" class="mt-4">
-                                <div class="row mb-4">
-                                    <div class="col-5">
-                                        <div class="input-group">
-                                            <input id="keyword" type="search" name="keyword" th:value="${keyword}" class="form-control" placeholder="&#128269; Search by city name">
-                                            <button type="submit" class="btn" style="background:#49b7bf; color:white; margin-right: 20px">Search</button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="mb-4">
-                                    <label class="form-label" for="pageSize">Items per page:</label>
-                                    <select name="size" th:value="${pageSize}" onchange="this.form.submit()" class="form-select" id="pageSize" style="width: auto; margin-left: 20px; margin-right: 20px; display:inline">
-                                        <option th:each="s : ${ {5, 10, 15} }" th:value="${s}" th:text="${s}" th:selected="${s == pageSize}"></option>
-                                    </select>
-                                    <button id="btnClear" class="btn" style="background:#f56e70; color:white;">Clear</button>
-                                </div>
-                            </form>
-                            <hr>
-                            <table class="table table-bordered" style="margin-top: 40px" th:if="${totalPages > 0}">
-                                <thead>
-                                <tr style="background:#f5f7f6;">
-                                    <th>#</th>
-                                    <th>City Name</th>
-                                    <th>Action</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr th:each="city, state : ${cityList}">
-                                    <td th:text="${city.id}" hidden></td>
-                                    <td th:text="${pageSize * (currentPage - 1) + state.index + 1}"></td>
-                                    <td th:text="${city.name}"></td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm">
-                                            <button type="button" class="btn btn-edit">Edit</button>
-                                            <a class="btn btn-delete">Delete</a>
-                                        </div>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                            <span th:if="${totalPages > 0}">Showing [[${pageSize * (currentPage - 1) + 1}]] to [[${pageSize * (currentPage - 1) + pageSize}]] of Total [[${totalItems}]] Entries</span>
-                            <div th:replace="~{fragments/paging :: cityPagination}"></div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Searching</h5>
+                    <form th:action="@{/api/city/page}" id="searchForm" class="mt-4">
+                        <div class="row mb-4">
+                            <div class="col-3">
+                                <input id="keyword" type="search" name="keyword" th:value="${keyword}" class="form-control" placeholder="&#128269; Search by city">
+                            </div>
+                            <div class="btn-group btn-group-sm col-auto">
+                                <button type="submit" class="btn" style="background:#49b7bf; color:white;">Search</button>
+                                <button id="btn-reset" class="btn" style="background:#f56e70; color:white;">Reset</button>
+                            </div>
                         </div>
-                    </div>
+                        <hr>
+                        <h4 class="text-danger" th:if="${cityList.isEmpty()}">No record found!</h4>
+                        <h5 class="card-title float-start" th:unless="${cityList.isEmpty()}">City List</h5>
+                        <div class="float-end mt-2" th:unless="${cityList.isEmpty()}">
+                            <label for="pageSize" class="form-label mt-1">Entries per page:&nbsp;&nbsp;</label>
+                            <select name="size" th:value="${pageSize}" onchange="this.form.submit()" class="form-select w-auto float-end" id="pageSize">
+                                <option th:each="s : ${ {5, 10, 15, 20} }" th:value="${s}" th:text="${s}" th:selected="${s == pageSize}"></option>
+                            </select>
+                        </div>
+                    </form>
+                    <table class="table table-bordered table-hover" th:unless="${cityList.isEmpty()}">
+                        <caption>Showing [[${pageSize * (currentPage - 1) + 1}]] to [[${pageSize * (currentPage - 1) + pageSize}]] of Total [[${totalItems}]] Entries</caption>
+                        <thead>
+                            <tr class="table-dark">
+                                <th>#</th>
+                                <th>City Name</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="city, state : ${cityList}">
+                                <td th:text="${city.id}" hidden></td>
+                                <td th:text="${pageSize * (currentPage - 1) + state.index + 1}"></td>
+                                <td th:text="${city.name}"></td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <button type="button" class="btn btn-edit">Edit</button>
+                                        <button type="button" class="btn btn-delete">Delete</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div th:replace="~{fragments/paging :: cityPagination}" th:unless="${cityList.isEmpty()}"></div>
                 </div>
             </div>
         </section>
-    </main><!-- End #main -->
-
-    <!-- ======= Footer ======= -->
-    <footer id="footer" class="footer">
-    </footer><!-- End Footer -->
+    </main>
 
     <script th:inline="javascript">
 
@@ -126,15 +115,6 @@
                     color: 'red',
                     title: 'Done',
                     message: 'Successfully Deleted!',
-                    position: 'topCenter'
-                });
-            }
-
-            if([[${deleted_fail}]]) {
-               iziToast.error({
-                    color: 'red',
-                    title: 'Failed!',
-                    message: 'Please delete all townships included in this city at first.',
                     position: 'topCenter'
                 });
             }
@@ -176,11 +156,13 @@
             $(document).delegate(".btn-edit", "click", function() {
                 var parent = $(this).parent().parent().parent();
                 var id = parent.children("td:nth-child(1)").html();
-                var cityName = parent.children("td:nth-child(3)").html();
+                var city_name = parent.children("td:nth-child(3)").html();
 
-                $("#cityName").val(cityName);
+                $("#cityName").val(city_name);
                 $(".btn-update").prop("disabled", false);
                 $(".btn-update").append("<span hidden>" + id + "</span>");
+                document.documentElement.scrollTop = 0;
+                document.activeElement.blur();
                 $("#cityName").focus();
             });
         <!-- End -->
@@ -233,10 +215,12 @@
             });
         <!-- End -->
 
-        <!-- When clear button is clicked -->
-            $("#btnClear").on("click", function(e) {
-              e.preventDefault();
-              window.location = "/api/city/";
+        <!-- When reset button is clicked -->
+            $("#btn-reset").on("click", function(e) {
+                e.preventDefault();
+                var pageSize = $("#pageSize").val();
+                pageSize = pageSize == undefined ? 5 : pageSize;
+                window.location = "/api/city/page?keyword=&size=" + pageSize;
             });
         <!-- End -->
 

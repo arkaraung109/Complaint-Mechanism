@@ -18,7 +18,13 @@ body {
   color: #444444;
 }
 
+th {
+    vertical-align: middle;
+}
+
 td {
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    max-width: 100px;
     vertical-align: middle;
 }
 

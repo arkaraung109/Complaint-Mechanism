@@ -26,7 +26,7 @@ public class Township {
     @JsonBackReference
     private City city;
 
-    @OneToMany(mappedBy = "township", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "township")
     @JsonManagedReference
     private List<IndustrialZone> industrialZoneList;
 

@@ -23,12 +23,12 @@ public class Company {
 
     private boolean activeStatus;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     @JoinColumn(name = "industrial_zone_id")
     @JsonBackReference
     private IndustrialZone industrialZone;
 
-    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "company")
     @JsonManagedReference
     private List<ComplaintForm> complaintFormList;
 

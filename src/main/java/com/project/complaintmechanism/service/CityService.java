@@ -10,15 +10,15 @@ import java.util.Optional;
 
 public interface CityService {
 
-    boolean existsByName(String name);
+    boolean existsByName(String cityName);
 
     Optional<City> findById(long id);
 
-    List<City> findAll();
+    List<String> findAllNames();
 
     Page<City> findByPage(Pageable paging);
 
-    Page<City> findByPageWithCityName(String cityName, Pageable paging);
+    Page<City> findByPageWithCityName(String keyword, Pageable paging);
 
     void saveOrUpdate(CityModel cityModel);
 

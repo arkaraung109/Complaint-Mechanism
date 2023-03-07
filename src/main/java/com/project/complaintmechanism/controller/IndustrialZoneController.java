@@ -1,11 +1,11 @@
 package com.project.complaintmechanism.controller;
 
-import com.project.complaintmechanism.entity.City;
 import com.project.complaintmechanism.entity.Company;
 import com.project.complaintmechanism.entity.IndustrialZone;
 import com.project.complaintmechanism.entity.Township;
 import com.project.complaintmechanism.model.IndustrialZoneModel;
 import com.project.complaintmechanism.service.CityService;
+import com.project.complaintmechanism.service.CompanyService;
 import com.project.complaintmechanism.service.IndustrialZoneService;
 import com.project.complaintmechanism.service.TownshipService;
 import jakarta.validation.Valid;
@@ -32,6 +32,8 @@ public class IndustrialZoneController {
     TownshipService townshipService;
     @Autowired
     IndustrialZoneService industrialZoneService;
+    @Autowired
+    CompanyService companyService;
 
     @GetMapping("/")
     public String showList(Model model) {
@@ -95,10 +97,10 @@ public class IndustrialZoneController {
         }
 
         List<IndustrialZone> industrialZoneList = industrialZonePage.getContent();
-        List<City> cityList = cityService.findAll();
-        List<Township> townshipList = townshipService.findAll();
-        model.addAttribute("cityList", cityList);
-        model.addAttribute("townshipList", townshipList);
+        List<String> cityNameList = cityService.findAllNames();
+        List<String> townshipNameList = townshipService.findAllNames();
+        model.addAttribute("cityNameList", cityNameList);
+        model.addAttribute("townshipNameList", townshipNameList);
         model.addAttribute("industrialZoneList", industrialZoneList);
         model.addAttribute("currentPage", industrialZonePage.getNumber() + 1);
         model.addAttribute("totalItems", industrialZonePage.getTotalElements());
@@ -161,13 +163,12 @@ public class IndustrialZoneController {
         if(industrialZone.isPresent()) {
             List<Company> companyList = industrialZone.get().getCompanyList();
 
-            if(companyList.isEmpty()) {
-                industrialZoneService.deleteById(id);
-                redirectAttributes.addFlashAttribute("deleted_success", true);
+            if(!companyList.isEmpty()) {
+                companyService.deleteCompanyByCompanyId(id);
             }
-            else {
-                redirectAttributes.addFlashAttribute("deleted_fail", true);
-            }
+
+            industrialZoneService.deleteById(id);
+            redirectAttributes.addFlashAttribute("deleted_success", true);
         }
         else {
             redirectAttributes.addFlashAttribute("industrial_zone_not_found", true);

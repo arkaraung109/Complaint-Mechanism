@@ -33,12 +33,12 @@ public class TownshipServiceImpl implements TownshipService {
 
     @Override
     public List<Township> findByCityName(String cityName) {
-        return townshipRepository.findByCityName(cityName);
+        return townshipRepository.findByCityNameOrderByNameAsc(cityName);
     }
 
     @Override
-    public List<Township> findAll() {
-        return townshipRepository.findAllByOrderByNameAsc();
+    public List<String> findAllNames() {
+        return townshipRepository.findAllDistinctNameByOrderByNameAsc();
     }
 
     @Override
@@ -78,6 +78,11 @@ public class TownshipServiceImpl implements TownshipService {
     @Override
     public void deleteById(long id) {
         townshipRepository.deleteById(id);
+    }
+
+    @Override
+    public void deleteCityByCityId(long id) {
+        townshipRepository.deleteCityByCityId(id);
     }
 
 }

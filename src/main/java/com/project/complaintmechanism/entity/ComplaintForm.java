@@ -21,6 +21,7 @@ public class ComplaintForm {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(length = 700)
     private String description;
 
     private String remark;
@@ -29,9 +30,11 @@ public class ComplaintForm {
 
     private boolean readStatus;
 
-    private boolean acceptedStatus;
+    private int acceptedStatus;
 
     private boolean solvedStatus;
+
+    private boolean tempDeletedStatus;
 
     private String name;
 
@@ -41,20 +44,30 @@ public class ComplaintForm {
 
     private String email;
 
-    private String idCardFront;
+    @Lob
+    @Column(columnDefinition = "MEDIUMBLOB")
+    private byte[] idCardFront;
 
-    private String idCardBack;
+    @Lob
+    @Column(columnDefinition = "MEDIUMBLOB")
+    private byte[] idCardBack;
 
-    private String ecPhoto1;
+    @Lob
+    @Column(columnDefinition = "MEDIUMBLOB")
+    private byte[] ecPhoto1;
 
-    private String ecPhoto2;
+    @Lob
+    @Column(columnDefinition = "MEDIUMBLOB")
+    private byte[] ecPhoto2;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id")
     @JsonBackReference
     private Company company;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {
+            CascadeType.MERGE
+    })
     @JoinTable(name = "complaint_form_title", joinColumns = @JoinColumn(name = "complaint_form_id"), inverseJoinColumns = @JoinColumn(name = "complaint_title_id"))
     @JsonManagedReference
     private Set<ComplaintTitle> complaintTitleSet = new HashSet<>();
