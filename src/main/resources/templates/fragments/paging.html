@@ -35,7 +35,7 @@
     </a>
 
     <a th:fragment="complaintPaging(pageNum, label, tooltip)" class="page-link"
-       th:href="@{'/api/complaint/page?' + ${companyName!=null && companyName!='' ? 'companyName=' + companyName + '&' : ''} + '' + ${complaintTitleName!=null && complaintTitleName!='' ? 'complaintTitleName=' + complaintTitleName + '&' : ''} + '' + ${date!=null && date!='' ? 'date=' + date + '&' : ''}  + 'page=' + ${pageNum} + '&size=' + ${pageSize}}"
+       th:href="@{'/api/complaint/page?' + ${date!=null && date!='' ? 'date=' + date + '&' : ''} + '' + ${companyName!=null && companyName!='' ? 'companyName=' + companyName + '&' : ''} + '' + ${complaintTitleName!=null && complaintTitleName!='' ? 'complaintTitleName=' + complaintTitleName + '&' : ''} + 'page=' + ${pageNum} + '&size=' + ${pageSize}}"
        th:title="${tooltip}" rel="tooltip">
         [[${label}]]
     </a>

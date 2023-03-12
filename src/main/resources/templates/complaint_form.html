@@ -159,6 +159,9 @@
             var industrialZoneName = document.querySelector("#industrialZoneName");
             var companyName = document.querySelector("#companyName");
             var complaintTitleName = document.querySelector("#complaintTitleName");
+            var township_select = [[${township_select}]] != null ? [[${township_select}]] : "";
+            var industrial_zone_select = [[${industrial_zone_select}]] != null ? [[${industrial_zone_select}]] : "";
+            var company_select = [[${company_select}]] != null ? [[${company_select}]] : "";
             dselect(cityName, {search: true});
             dselect(townshipName, {search: true});
             dselect(industrialZoneName, {search: true});
@@ -194,7 +197,12 @@
                             }
 
                             dselect(townshipName, {search: true});
-                            $("#submitForm .row #township-select .dselect-wrapper .dropdown-menu .d-flex .dselect-items button:contains(" + [[${township_select}]] + ")").click();
+                            if(township_select != "") {
+                                $("#submitForm .row #township-select .dselect-wrapper .dropdown-menu .d-flex .dselect-items button:contains(" + township_select + ")").click();
+                            }
+                        }
+                        else {
+                            dselect(townshipName, {search: true});
                         }
 
                         setTimeout(function() {
@@ -202,7 +210,8 @@
                                 url: "/api/complaintForm/townshipToIndustrialZone",
                                 type: "POST",
                                 data: {
-                                    "townshipName" : [[${township_select}]]
+                                    "cityName" : city_name,
+                                    "townshipName" : township_select
                                 },
                                 success: function(data) {
                                     $("#industrialZoneName option[value!='']").remove();
@@ -213,7 +222,12 @@
                                         }
 
                                         dselect(industrialZoneName, {search: true});
-                                        $("#submitForm .row #industrial-zone-select .dselect-wrapper .dropdown-menu .d-flex .dselect-items button:contains(" + [[${industrial_zone_select}]] + ")").click();
+                                        if(industrial_zone_select != "") {
+                                            $("#submitForm .row #industrial-zone-select .dselect-wrapper .dropdown-menu .d-flex .dselect-items button:contains(" + industrial_zone_select + ")").click();
+                                        }
+                                    }
+                                    else {
+                                        dselect(industrialZoneName, {search: true});
                                     }
 
                                     setTimeout(function() {
@@ -221,7 +235,9 @@
                                             url: "/api/complaintForm/industrialZoneToCompany",
                                             type: "POST",
                                             data: {
-                                                "industrialZoneName" : [[${industrial_zone_select}]]
+                                                "cityName" : city_name,
+                                                "townshipName" : township_select,
+                                                "industrialZoneName" : industrial_zone_select
                                             },
                                             success: function(data) {
                                                 $("#companyName option[value!='']").remove();
@@ -232,8 +248,15 @@
                                                     }
 
                                                     dselect(companyName, {search: true});
-                                                    $("#submitForm .row #company-select .dselect-wrapper .dropdown-menu .d-flex .dselect-items button:contains(" + [[${company_select}]] + ")").click();
+                                                    if(company_select != "") {
+                                                        $("#submitForm .row #company-select .dselect-wrapper .dropdown-menu .d-flex .dselect-items button:contains(" + company_select + ")").click();
+                                                    }
                                                 }
+                                                else {
+                                                    dselect(companyName, {search: true});
+                                                }
+                                                document.documentElement.scrollTop = 0;
+                                                document.activeElement.blur();
                                             }
                                         });
                                     }, 100);
@@ -243,7 +266,6 @@
                     }
                 });
             }, 100);
-
         <!-- End -->
 
         <!-- When submit button is clicked -->
@@ -292,16 +314,13 @@
                             for(var i = 0; i < data.length; i++) {
                                 $("#townshipName").append(`<option value="${data[i].name}">${data[i].name}</option>`);
                             }
+                        }
 
-                            dselect(townshipName, {search: true});
-                        }
-                        else {
-                            dselect(townshipName, {search: true});
-                            $("#industrialZoneName option[value!='']").remove();
-                            dselect(industrialZoneName, {search: true});
-                            $("#companyName option[value!='']").remove();
-                            dselect(companyName, {search: true});
-                        }
+                        dselect(townshipName, {search: true});
+                        $("#industrialZoneName option[value!='']").remove();
+                        dselect(industrialZoneName, {search: true});
+                        $("#companyName option[value!='']").remove();
+                        dselect(companyName, {search: true});
                     }
                 });
             });
@@ -321,20 +340,16 @@
                     },
                     success: function(data) {
                         $("#industrialZoneName option[value!='']").remove();
-                        $("#companyName option[value!='']").remove();
 
                         if(data.length != 0) {
                             for(var i = 0; i < data.length; i++) {
                                 $("#industrialZoneName").append(`<option value="${data[i].name}">${data[i].name}</option>`);
                             }
+                        }
 
-                            dselect(industrialZoneName, {search: true});
-                        }
-                        else {
-                            dselect(industrialZoneName, {search: true});
-                            $("#companyName option[value!='']").remove();
-                            dselect(companyName, {search: true});
-                        }
+                        dselect(industrialZoneName, {search: true});
+                        $("#companyName option[value!='']").remove();
+                        dselect(companyName, {search: true});
                     }
                 });
             });
@@ -361,12 +376,9 @@
                             for(var i = 0; i < data.length; i++) {
                                 $("#companyName").append(`<option value="${data[i].name}">${data[i].name}</option>`);
                             }
+                        }
 
-                            dselect(companyName, {search: true});
-                        }
-                        else {
-                            dselect(companyName, {search: true});
-                        }
+                        dselect(companyName, {search: true});
                     }
                 });
             });

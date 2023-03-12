@@ -108,6 +108,12 @@
 
         $(document).ready(function() {
 
+        <!-- Make Nav Item Active -->
+            $("#sidebar-nav").children("li:nth-child(2)").children("a").removeClass("collapsed");
+            $("#settings-nav").addClass("show");
+            $("#settings-nav").children("li:nth-child(2)").children("a").addClass("active");
+        <!-- End -->
+
         <!-- Search Boxes in Select Dropdown -->
             var cityName = document.querySelector("#cityName");
             var citySearch = document.querySelector("#citySearch");

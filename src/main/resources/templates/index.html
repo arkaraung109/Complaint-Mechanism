@@ -8,5 +8,15 @@
 </head>
 <body>
     <div th:replace="~{fragments/header :: header}"></div>
+    <script th:inline="javascript">
+        $(document).ready(function() {
+
+        <!-- Make Nav Item Active -->
+            $("#sidebar-nav").children("li:nth-child(1)").children("a").removeClass("collapsed");
+        <!-- End -->
+
+        });
+
+    </script>
 </body>
 </html>

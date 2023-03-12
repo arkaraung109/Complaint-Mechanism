@@ -11,7 +11,7 @@
                     <img th:src="@{/img/icon1.png}" alt="">
                     <span class="d-none d-lg-block">VLCA</span>
                 </a>
-                <i class="fa-solid fa-bars toggle-sidebar-btn"></i>
+                <i class="bi bi-list toggle-sidebar-btn"></i>
             </div>
             <nav class="header-nav ms-auto">
                 <ul class="d-flex align-items-center">
@@ -46,43 +46,44 @@
         <aside id="sidebar" class="sidebar">
             <ul class="sidebar-nav" id="sidebar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" th:href="@{/}">
-                        <i class="fa-solid fa-house"></i>
-                        <span class="ms-1">Welcome</span>
+                    <a class="nav-link collapsed" th:href="@{/}">
+                        <i class="bi bi-grid mb-1"></i>
+                        <span>Dashboard</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link collapsed" data-bs-target="#components-nav" data-bs-toggle="collapse" href="#">
-                        <i class="fa-solid fa-chevron-right"></i>
-                        <span class="ms-2">Master Setting</span>
-                        <i class="fa-solid fa-chevron-down ms-auto"></i>
+                    <a class="nav-link collapsed" data-bs-target="#settings-nav" data-bs-toggle="collapse" href="#">
+                        <i class="bi bi-gear mb-1"></i>
+                        <span>General Settings</span>
+                        <i class="bi bi-chevron-down ms-auto"></i>
                     </a>
-                    <ul id="components-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
-                        <li><a th:href="@{/api/city/}"><i class="fa-solid fa-chevron-right"></i><span class="ms-2">City</span></a></li>
-                        <li><a th:href="@{/api/township/}"><i class="fa-solid fa-chevron-right"></i><span class="ms-2">Township</span></a></li>
-                        <li><a th:href="@{/api/industrialZone/}"><i class="fa-solid fa-chevron-right"></i><span class="ms-2">Industrial Zone</span></a></li>
-                        <li><a th:href="@{/api/company/}"><i class="fa-solid fa-chevron-right"></i><span class="ms-2">Company</span></a></li>
+                    <ul id="settings-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+                        <li><a th:href="@{/api/city/}"><i class="bi bi-circle mt-1"></i><span>City</span></a></li>
+                        <li><a th:href="@{/api/township/}"><i class="bi bi-circle mt-1"></i><span>Township</span></a></li>
+                        <li><a th:href="@{/api/industrialZone/}"><i class="bi bi-circle mt-1"></i><span>Industrial Zone</span></a></li>
+                        <li><a th:href="@{/api/company/}"><i class="bi bi-circle mt-1"></i><span>Company</span></a></li>
+                        <li><a th:href="@{/api/complaintTitle/}"><i class="bi bi-circle mt-1"></i><span>Complaint Title</span></a></li>
                     </ul>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
-                        <i class="fa-solid fa-chevron-right"></i>
-                        <span class="ms-2">Complaint Setting</span>
-                        <i class="fa-solid fa-chevron-down ms-auto"></i>
+                    <a class="nav-link collapsed" data-bs-target="#status-nav" data-bs-toggle="collapse" href="#">
+                        <i class="bi bi-layout-text-window-reverse mb-1"></i>
+                        <span>Complaint List</span>
+                        <i class="bi bi-chevron-down ms-auto"></i>
                     </a>
-                    <ul id="forms-nav" class="nav-content collapse"	data-bs-parent="#sidebar-nav">
-                        <li>
-                            <a th:href="@{/api/complaintTitle/}">
-                                <i class="fa-solid fa-chevron-right"></i>
-                                <span class="ms-2">Complaint Title</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a th:href="@{/api/complaint/}">
-                                <i class="fa-solid fa-chevron-right"></i>
-                                <span class="ms-2">Complaint List</span>
-                            </a>
-                        </li>
+                    <ul id="status-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+                        <li><a th:href="@{/api/complaint/all}"><i class="bi bi-circle"></i><span>All</span></a></li>
+                        <li><a th:href="@{/api/complaint/trash}"><i class="bi bi-circle"></i><span>Trash</span></a></li>
+                        <li><hr class="m-0"></li>
+                        <li><a th:href="@{/api/complaint/read}"><i class="bi bi-circle"></i><span>Read</span></a></li>
+                        <li><a th:href="@{/api/complaint/unread}"><i class="bi bi-circle"></i><span>Unread</span></a></li>
+                        <li><hr class="m-0"></li>
+                        <li><a th:href="@{/api/complaint/accepted}"><i class="bi bi-circle"></i><span>Accepted</span></a></li>
+                        <li><a th:href="@{/api/complaint/rejected}"><i class="bi bi-circle"></i><span>Rejected</span></a></li>
+                        <li><a th:href="@{/api/complaint/pending}"><i class="bi bi-circle"></i><span>Pending</span></a></li>
+                        <li><hr class="m-0"></li>
+                        <li><a th:href="@{/api/complaint/solved}"><i class="bi bi-circle"></i><span>Solved</span></a></li>
+                        <li><a th:href="@{/api/complaint/unsolved}"><i class="bi bi-circle"></i><span>Unsolved</span></a></li>
                     </ul>
                 </li>
             </ul>

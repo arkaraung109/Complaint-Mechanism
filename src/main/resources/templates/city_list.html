@@ -92,6 +92,12 @@
 
         $(document).ready(function() {
 
+        <!-- Make Nav Item Active -->
+            $("#sidebar-nav").children("li:nth-child(2)").children("a").removeClass("collapsed");
+            $("#settings-nav").addClass("show");
+            $("#settings-nav").children("li:nth-child(1)").children("a").addClass("active");
+        <!-- End -->
+
         <!-- Alert Boxes -->
             if([[${added_success}]]) {
                 iziToast.success({

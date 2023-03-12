@@ -11,10 +11,11 @@
     <main id="main" class="main">
         <div class="pagetitle">
             <nav>
-                <ol class="breadcrumb">
+                <ol class="breadcrumb" id="breadcrumb">
                     <li class="breadcrumb-item"><a th:href="@{/}"><i class="fa-solid fa-house"></i><span class="ms-1">Welcome</span></a></li>
-                    <li class="breadcrumb-item"><a th:href="@{/api/complaint/}">Complaint List</a></li>
+                    <li class="breadcrumb-item"><a th:href="@{/api/complaint/all}">Complaint List</a></li>
                 </ol>
+                <span id="status" hidden>[[${session.status}]]</span>
             </nav>
         </div>
         <section class="section">
@@ -33,7 +34,7 @@
                     <form th:action="@{/api/complaint/page}" id="searchForm">
                         <div class="row mb-2">
                             <div class="col-3">
-                                <input type="text" id="datepicker" name="date" placeholder="Search by all dates" readonly/>
+                                <input type="text" id="datepicker" name="date" placeholder="Search by all dates" th:value="${date}" readonly/>
                             </div>
                             <div class="col-3">
                                 <select class="form-select" id="companySearch" name="companyName">
@@ -52,14 +53,19 @@
                             <button type="submit" class="btn" style="background:#49b7bf; color:white;">Search</button>
                             <button id="btn-reset" class="btn" style="background:#f56e70; color:white;">Reset</button>
                         </div>
-                        <hr th:unless="${complaintList.isEmpty()}">
+                        <hr>
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert" th:if="${session.status == 'Trash' && !complaintList.isEmpty}">
+                            <strong>Remember!</strong> Complaints that have been in Trash more than 30 days will be automatically deleted. <a id="empty-trash" class="text-primary ms-2" style="cursor: pointer"><b>Empty Trash Now</b></a>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
                         <div class="float-end">
-                            <b class="form-label mt-1" th:unless="${complaintList.isEmpty()}">Number of Complaints Today:&nbsp;&nbsp;[[${complaintCount}]]</b>
+                            <b class="form-label mt-1">Number of Complaints Today:&nbsp;&nbsp;[[${complaintCount}]]</b>
                         </div>
                         <div class="float-end me-5">
                             <b class="form-label mt-1">Maximum Daily Limit of Complaints:&nbsp;&nbsp;[[${limit}]]</b>
                         </div>
-                        <h5 class="card-title" th:unless="${complaintList.isEmpty()}">Complaint List</h5>
+                        <h4 class="text-danger mt-5" th:if="${complaintList.isEmpty()}">No record found!</h4>
+                        <h5 class="card-title mt-5" th:unless="${complaintList.isEmpty()}">Complaint List</h5>
                         <div class="float-end mb-3" th:unless="${complaintList.isEmpty()}">
                             <label for="pageSize" class="form-label mt-1">Entries per page:&nbsp;&nbsp;</label>
                             <select name="size" th:value="${pageSize}" onchange="this.form.submit()" class="form-select w-auto float-end" id="pageSize">
@@ -67,29 +73,13 @@
                             </select>
                         </div>
                     </form>
-                    <div class="btn-group dropdown" th:unless="${complaintList.isEmpty()}">
-                        <a class="btn dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">View</a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item active" href="#">All</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#">Read</a></li>
-                            <li><a class="dropdown-item" href="#">Unread</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#">Accepted</a></li>
-                            <li><a class="dropdown-item" href="#">Rejected</a></li>
-                            <li><a class="dropdown-item" href="#">Unassigned</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#">Solved</a></li>
-                            <li><a class="dropdown-item" href="#">Unsolved</a></li>
-                        </ul>
-                    </div>
                     <div class="btn-group" th:unless="${complaintList.isEmpty()}">
                         <a class="btn dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">Action</a>
-                        <ul class="dropdown-menu">
+                        <ul class="dropdown-menu" id="dropdown-menu">
                             <li><a class="dropdown-item" id="markAsRead" style="cursor: pointer">Mark as read</a></li>
                             <li><a class="dropdown-item" id="markAsUnread" style="cursor: pointer">Mark as unread</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#">Delete</a></li>
+                            <li><a class="dropdown-item" id="tempDelete" style="cursor: pointer">Delete</a></li>
                         </ul>
                     </div>
                     <table class="table table-borderless table-responsive table-hover" th:unless="${complaintList.isEmpty()}">
@@ -123,12 +113,36 @@
                 </div>
             </div>
         </section>
-        <h4 class="text-danger" th:if="${complaintList.isEmpty()}">No record found!</h4>
     </main>
 
     <script th:inline="javascript">
 
         $(document).ready(function() {
+
+        <!-- Make Nav Item Active -->
+
+            $("#sidebar-nav").children("li:nth-child(3)").children("a").removeClass("collapsed");
+            $("#status-nav").addClass("show");
+
+            var status = $("#status").html();
+            var url = "/api/complaint/" + status.toLowerCase();
+            var number;
+            switch(status) {
+                case "All": number = 1; break;
+                case "Trash": number = 2; $("#dropdown-menu").children("li:nth-child(4)").remove(); $("#dropdown-menu").append("<li><a class='dropdown-item' id='restore' style='cursor: pointer'>Restore</a></li>"); break;
+                case "Read": number = 4; break;
+                case "Unread": number = 5; break;
+                case "Accepted": number = 7; break;
+                case "Rejected": number = 8; break;
+                case "Pending": number = 9; break;
+                case "Solved": number = 11; break;
+                case "Unsolved": number = 12; break;
+                default: number = 1; break;
+            }
+            $("#status-nav").children("li:nth-child("+ number + ")").children("a").addClass("active");
+            $("#breadcrumb").append("<li class='breadcrumb-item'><a href='" + url + "'>" + status + "</a></li>");
+
+        <!-- End -->
 
         <!-- Placing value in input form of daily limit -->
             var span = $("#dailyLimitForm .row").children("span");
@@ -145,13 +159,51 @@
             dselect(complaintTitleSearch, {search: true});
         <!-- End -->
 
+        <!-- Alert box after moved to trash -->
+            if(localStorage.getItem("tempDeletedStatus")) {
+                localStorage.clear();
+                iziToast.success({
+                    title: 'Done',
+                    message: 'Successfully Moved to Trash! Please check the trash bin.',
+                    position: 'topCenter'
+                });
+            }
+        <!-- End -->
+
+        <!-- Alert box after restore from trash -->
+            if(localStorage.getItem("restoreStatus")) {
+                localStorage.clear();
+                iziToast.success({
+                    title: 'Done',
+                    message: 'Successfully Restored from Trash!',
+                    position: 'topCenter'
+                });
+            }
+        <!-- End -->
+
+        <!-- Alert box after empty trash -->
+            if(localStorage.getItem("emptyTrash")) {
+                localStorage.clear();
+                iziToast.success({
+                    title: 'Done',
+                    message: 'Successfully Deleted All from Trash!',
+                    position: 'topCenter'
+                });
+            }
+        <!-- End -->
+
+        <!-- Datepicker -->
             $("#datepicker").datepicker({
                 uiLibrary: 'bootstrap5',
                 format: 'yyyy-mm-dd'
             });
+        <!-- End -->
 
+        <!-- Check All Table Function -->
             $("table").TableCheckAll();
+        <!-- End -->
 
+        <!-- When setting maximum daily limit -->
             if([[${updated_success}]]) {
                 var limit = [[${limit}]] + ' complaint form.';
                 if([[${limit}]] > 1) {
@@ -163,7 +215,9 @@
                     position: 'topCenter'
                 });
             }
+        <!-- End -->
 
+        <!-- When clicked the specific complaint -->
             $(document).delegate(".complaint", "click", function(event) {
                 if(event.target.tagName.toLowerCase() === "td") {
                     var row = $(this);
@@ -184,8 +238,10 @@
                     }
                 }
             });
+        <!-- End -->
 
-            $("#markAsRead").click(function(event) {
+        <!-- When mark as read button is clicked -->
+            $("#markAsRead").on("click", function(event) {
                 $("table tbody tr td input[name='checkbox']:checked").each(function() {
                     var id = $(this).parent().parent().children("td:nth-child(1)").html();
                     var row = $(this).parent().parent();
@@ -197,14 +253,17 @@
                             "status" : true
                         },
                         success: function(data) {
-                            row.css("font-weight", "");
-                            row.removeClass("shadow-sm").addClass("table-secondary");
+                            //row.css("font-weight", "");
+                            //row.removeClass("shadow-sm").addClass("table-secondary");
+                            location.reload();
                         }
                     });
                 });
             });
+        <!-- End -->
 
-            $("#markAsUnread").click(function(event) {
+        <!-- When mark as unread button is clicked -->
+            $("#markAsUnread").on("click", function(event) {
                 $("table tbody tr td input[name='checkbox']:checked").each(function() {
                     var id = $(this).parent().parent().children("td:nth-child(1)").html();
                     var row = $(this).parent().parent();
@@ -216,12 +275,92 @@
                             "status" : false
                         },
                         success: function(data) {
-                            row.css("font-weight", "bold");
-                            row.removeClass("table-secondary").addClass("shadow-sm");
+                            //row.css("font-weight", "bold");
+                            //row.removeClass("table-secondary").addClass("shadow-sm");
+                            location.reload();
                         }
                     });
                 });
             });
+        <!-- End -->
+
+        <!-- When delete button is clicked -->
+            $("#tempDelete").on("click", function(event) {
+                $("table tbody tr td input[name='checkbox']:checked").each(function() {
+                    var id = $(this).parent().parent().children("td:nth-child(1)").html();
+                    $.ajax({
+                        url: "/api/complaint/changeTempDeletedStatus",
+                        type: "POST",
+                        data: {
+                            "id" : id,
+                            "status" : true
+                        },
+                        success: function(data) {
+                            localStorage.setItem("tempDeletedStatus",true);
+                            location.reload();
+                        }
+                    });
+                });
+            });
+        <!-- End -->
+
+        <!-- When restore button is clicked -->
+            $("#restore").on("click", function(event) {
+                $("table tbody tr td input[name='checkbox']:checked").each(function() {
+                    var id = $(this).parent().parent().children("td:nth-child(1)").html();
+                    $.ajax({
+                        url: "/api/complaint/changeTempDeletedStatus",
+                        type: "POST",
+                        data: {
+                            "id" : id,
+                            "status" : false
+                        },
+                        success: function(data) {
+                            localStorage.setItem("restoreStatus",true);
+                            location.reload();
+                        }
+                    });
+                });
+            });
+        <!-- End -->
+
+        <!-- When reset button is clicked -->
+            $("#btn-reset").on("click", function(e) {
+                e.preventDefault();
+                var pageSize = $("#pageSize").val();
+                pageSize = pageSize == undefined ? 5 : pageSize;
+                window.location = "/api/complaint/page?date=&companyName=&complaintTitleName=&size=" + pageSize;
+            });
+        <!-- End -->
+
+        <!-- When empty trash button is clicked -->
+            $("#empty-trash").on("click", function(event) {
+                event.preventDefault();
+                $.confirm({
+                    title: 'Confirm!',
+                    content: "Are you sure to make trash empty?",
+                    type: 'red',
+                    autoClose: 'no|10000',
+                    buttons: {
+                        yes: {
+                            btnClass: 'btn-danger',
+                            action: function () {
+                                $.ajax({
+                                    url: "/api/complaint/emptyTrash",
+                                    type: "POST",
+                                    success: function(data) {
+                                        localStorage.setItem("emptyTrash",true);
+                                        location.reload();
+                                    }
+                                });
+                            }
+                        },
+                        no: function () {}
+                    }
+                });
+
+            });
+        <!-- End -->
 
         });
 

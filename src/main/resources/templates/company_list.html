@@ -149,6 +149,13 @@
     <script th:inline="javascript">
 
         $(document).ready(function() {
+
+        <!-- Make Nav Item Active -->
+            $("#sidebar-nav").children("li:nth-child(2)").children("a").removeClass("collapsed");
+            $("#settings-nav").addClass("show");
+            $("#settings-nav").children("li:nth-child(4)").children("a").addClass("active");
+        <!-- End -->
+
         <!-- Search Boxes in Select Box -->
             var cityName = document.querySelector("#cityName");
             var citySearch = document.querySelector("#citySearch");
@@ -156,6 +163,8 @@
             var townshipSearch = document.querySelector("#townshipSearch");
             var industrialZoneName = document.querySelector("#industrialZoneName");
             var industrialZoneSearch = document.querySelector("#industrialZoneSearch");
+            var township_select = [[${township_select}]] != null ? [[${township_select}]] : "";
+            var industrial_zone_select = [[${industrial_zone_select}]] != null ? [[${industrial_zone_select}]] : "";
 
             dselect(cityName, {search: true});
             dselect(townshipName, {search: true});
@@ -190,7 +199,12 @@
                             }
 
                             dselect(townshipName, {search: true});
-                            $("#submitForm .row #township-select .dselect-wrapper .dropdown-menu .d-flex .dselect-items button:contains(" + [[${township_select}]] + ")").click();
+                            if(township_select != "") {
+                                $("#submitForm .row #township-select .dselect-wrapper .dropdown-menu .d-flex .dselect-items button:contains(" + township_select + ")").click();
+                            }
+                        }
+                        else {
+                            dselect(townshipName, {search: true});
                         }
 
                         setTimeout(function() {
@@ -198,7 +212,8 @@
                                 url: "/api/company/townshipToIndustrialZone",
                                 type: "POST",
                                 data: {
-                                    "townshipName" : [[${township_select}]]
+                                    "cityName" : city_name,
+                                    "townshipName" : township_select
                                 },
                                 success: function(data) {
                                     $("#industrialZoneName option[value!='']").remove();
@@ -209,11 +224,16 @@
                                         }
 
                                         dselect(industrialZoneName, {search: true});
-                                        $("#submitForm .row #industrial-zone-select .dselect-wrapper .dropdown-menu .d-flex .dselect-items button:contains(" + [[${industrial_zone_select}]] + ")").click();
-                                        document.documentElement.scrollTop = 0;
-                                        document.activeElement.blur();
-                                        $("#companyName").focus();
+                                        if(industrial_zone_select != "") {
+                                            $("#submitForm .row #industrial-zone-select .dselect-wrapper .dropdown-menu .d-flex .dselect-items button:contains(" + industrial_zone_select + ")").click();
+                                        }
                                     }
+                                    else {
+                                        dselect(industrialZoneName, {search: true});
+                                    }
+                                    document.documentElement.scrollTop = 0;
+                                    document.activeElement.blur();
+                                    $("#companyName").focus();
                                 }
                             });
                         }, 100);
@@ -329,12 +349,16 @@
                                     $("#submitForm .row #township-select .dselect-wrapper .dropdown-menu .d-flex .dselect-items button:contains(" + township_name + ")").click();
                                 }
                             }
+                            else {
+                                dselect(townshipName, {search: true});
+                            }
 
                             setTimeout(function() {
                                 $.ajax({
                                     url: "/api/company/townshipToIndustrialZone",
                                     type: "POST",
                                     data: {
+                                        "cityName" : city_name,
                                         "townshipName" : township_name
                                     },
                                     success: function(data) {
@@ -353,6 +377,9 @@
                                             else {
                                                 $("#submitForm .row #industrial-zone-select .dselect-wrapper .dropdown-menu .d-flex .dselect-items button:contains(" + industrial_zone_name + ")").click();
                                             }
+                                        }
+                                        else {
+                                            dselect(industrialZoneName, {search: true});
                                         }
 
                                         document.documentElement.scrollTop = 0;
@@ -429,19 +456,17 @@
                     },
                     success: function(data) {
                         $("#townshipName option[value!='']").remove();
+                        $("#industrialZoneName option[value!='']").remove();
 
                         if(data.length != 0) {
                             for(var i = 0; i < data.length; i++) {
                                 $("#townshipName").append(`<option value="${data[i].name}">${data[i].name}</option>`);
                             }
+                        }
 
-                            dselect(townshipName, {search: true});
-                        }
-                        else {
-                            dselect(townshipName, {search: true});
-                            $("#industrialZoneName option[value!='']").remove();
-                            dselect(industrialZoneName, {search: true});
-                        }
+                        dselect(townshipName, {search: true});
+                        $("#industrialZoneName option[value!='']").remove();
+                        dselect(industrialZoneName, {search: true});
                     }
                 });
             });
@@ -449,12 +474,14 @@
 
         <!-- When township select box is changed -->
             $("#townshipName").change(function() {
+                var city_name = $("#cityName option:selected").text();
                 var township_name = $("#townshipName option:selected").text();
 
                 $.ajax({
                     url: "/api/company/townshipToIndustrialZone",
                     type: "POST",
                     data: {
+                        "cityName" : city_name,
                         "townshipName" : township_name
                     },
                     success: function(data) {
@@ -464,12 +491,9 @@
                             for(var i = 0; i < data.length; i++) {
                                 $("#industrialZoneName").append(`<option value="${data[i].name}">${data[i].name}</option>`);
                             }
+                        }
 
-                            dselect(industrialZoneName, {search: true});
-                        }
-                        else {
-                            dselect(industrialZoneName, {search: true});
-                        }
+                        dselect(industrialZoneName, {search: true});
                     }
                 });
             });
