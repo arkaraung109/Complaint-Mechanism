@@ -25,6 +25,6 @@ public class ComplaintTitle {
             CascadeType.MERGE
     })
     @JsonBackReference
-    private Set<ComplaintForm> complaintFormSet = new HashSet<>();
+    private Set<Complaint> complaintSet = new HashSet<>();
 
 }

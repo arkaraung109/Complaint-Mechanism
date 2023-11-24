@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 public class UniqueComplaintTitleValidator implements ConstraintValidator<UniqueComplaintTitle, String> {
 
     @Autowired
-    ComplaintTitleService complaintTitleService;
+    private ComplaintTitleService complaintTitleService;
 
     @Override
     public boolean isValid(String name, ConstraintValidatorContext constraintValidatorContext) {

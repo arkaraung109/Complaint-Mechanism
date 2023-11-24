@@ -1,16 +1,15 @@
 package com.project.complaintmechanism.controller;
 
+import com.project.complaintmechanism.entity.City;
 import com.project.complaintmechanism.entity.IndustrialZone;
 import com.project.complaintmechanism.entity.Township;
 import com.project.complaintmechanism.model.TownshipModel;
 import com.project.complaintmechanism.service.CityService;
-import com.project.complaintmechanism.service.IndustrialZoneService;
 import com.project.complaintmechanism.service.TownshipService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -18,125 +17,117 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 
 @Controller
 @RequestMapping("/api/township")
 public class TownshipController {
 
     @Autowired
-    CityService cityService;
+    private CityService cityService;
     @Autowired
-    TownshipService townshipService;
-    @Autowired
-    IndustrialZoneService industrialZoneService;
+    private TownshipService townshipService;
 
-    @GetMapping("/")
-    public String showList(Model model) {
-
-        model.addAttribute("township", new TownshipModel());
-        return getByPage(model, null, null, 1, 5);
-
+    @PostMapping("/cityId")
+    @ResponseBody
+    public List<Township> findByCityId(@RequestParam("cityId") long cityId) {
+        return townshipService.findByCityId(cityId);
     }
 
-    @GetMapping("/page")
-    public String getPaginated(Model model, @RequestParam(required = false) String cityName, @RequestParam(required = false) String keyword, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "5") int size) {
-
-        model.addAttribute("township", new TownshipModel());
-        return getByPage(model, cityName, keyword, page, size);
-
-    }
-
-    public String getByPage(Model model, String cityName, String keyword, int page, int size) {
-
-        Pageable paging = PageRequest.of(page - 1, size);
-        Page<Township> townshipPage;
-        boolean isEmptyKeyword = (keyword == null || keyword.equalsIgnoreCase(""));
-        boolean isEmptyCityName = (cityName == null || cityName.equalsIgnoreCase(""));
-
-        if(isEmptyKeyword && isEmptyCityName) {
-            townshipPage = townshipService.findByPage(paging);
-        }
-        else if(!isEmptyKeyword && isEmptyCityName) {
-            townshipPage = townshipService.findByPageWithTownshipName(keyword, paging);
-            model.addAttribute("keyword", keyword);
-        }
-        else if(isEmptyKeyword && !isEmptyCityName) {
-            townshipPage = townshipService.findByPageWithCityName(cityName, paging);
-            model.addAttribute("cityName", cityName);
-        }
-        else {
-            townshipPage = townshipService.findByPageWithCityNameAndTownshipName(cityName, keyword, paging);
-            model.addAttribute("cityName", cityName);
-            model.addAttribute("keyword", keyword);
-        }
-
+    @GetMapping("/list")
+    public String navigateToListPage(@RequestParam(defaultValue = "") String cityName, @RequestParam(defaultValue = "") String keyword, @RequestParam(defaultValue = "1") int pageNum, @RequestParam(defaultValue = "5") int pageSize, Model model, HttpSession httpSession) {
+        Page<Township> townshipPage = townshipService.findByPage(cityName, keyword, pageNum, pageSize);
         List<Township> townshipList = townshipPage.getContent();
         List<String> cityNameList = cityService.findAllNames();
-        model.addAttribute("townshipList", townshipList);
+
+        httpSession.setAttribute("cityName", cityName);
+        httpSession.setAttribute("keyword", keyword);
+        httpSession.setAttribute("pageNum", pageNum);
+        httpSession.setAttribute("pageSize", pageSize);
+
         model.addAttribute("cityNameList", cityNameList);
+        model.addAttribute("townshipList", townshipList);
+        model.addAttribute("cityName", cityName);
+        model.addAttribute("keyword", keyword);
         model.addAttribute("currentPage", townshipPage.getNumber() + 1);
         model.addAttribute("totalItems", townshipPage.getTotalElements());
         model.addAttribute("totalPages", townshipPage.getTotalPages());
-        model.addAttribute("pageSize", size);
-        return "township_list";
+        model.addAttribute("pageSize", pageSize);
+        return "township/township_list";
+    }
 
+    @GetMapping("/add")
+    public String navigateToAddPage(Model model) {
+        List<City> cityList = cityService.findAll();
+        model.addAttribute("cityList", cityList);
+        model.addAttribute("township", new TownshipModel());
+        return "township/township_add";
     }
 
     @PostMapping("/add")
     public String add(@Valid @ModelAttribute("township") TownshipModel townshipModel, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
-
-        if(!result.hasErrors()) {
-            townshipService.saveOrUpdate(townshipModel);
+        if (!result.hasErrors()) {
+            townshipService.save(townshipModel);
             redirectAttributes.addFlashAttribute("added_success", true);
-            return "redirect:/api/township/";
+            return "redirect:/api/township/add";
         }
-        return getByPage(model, null, null, 1, 5);
 
+        List<City> cityList = cityService.findAll();
+        model.addAttribute("cityList", cityList);
+        model.addAttribute("township", townshipModel);
+        return "township/township_add";
     }
 
-    @PostMapping("/update/{id}")
-    public String update(@PathVariable("id") long id, @Valid @ModelAttribute("township") TownshipModel townshipModel, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
+    @GetMapping("/edit/{id}")
+    public String navigateToEditPage(@PathVariable("id") long id, Model model, RedirectAttributes redirectAttributes) {
+        Township township = townshipService.findById(id);
 
-        Optional<Township> township = townshipService.findById(id);
-        if(township.isPresent()) {
-            if(!result.hasErrors()) {
-                townshipModel.setId(id);
-                townshipService.saveOrUpdate(townshipModel);
-                redirectAttributes.addFlashAttribute("updated_success", true);
-                return "redirect:/api/township/";
-            }
-
-            return getByPage(model, null, null, 1, 5);
-        }
-        else {
+        if (!Objects.isNull(township)) {
+            List<City> cityList = cityService.findAll();
+            TownshipModel townshipModel = TownshipModel.builder()
+                    .id(township.getId())
+                    .name(township.getName())
+                    .cityId(township.getCity().getId())
+                    .build();
+            model.addAttribute("cityList", cityList);
+            model.addAttribute("township", townshipModel);
+            return "township/township_edit";
+        } else {
             redirectAttributes.addFlashAttribute("township_not_found", true);
-            return "redirect:/api/township/";
+            return "redirect:/api/township/list";
+        }
+    }
+
+    @PostMapping("/edit")
+    public String update(@Valid @ModelAttribute("township") TownshipModel townshipModel, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
+        if (!result.hasErrors()) {
+            townshipService.update(townshipModel);
+            redirectAttributes.addFlashAttribute("updated_success", true);
+            return "redirect:/api/township/list";
         }
 
+        List<City> cityList = cityService.findAll();
+        model.addAttribute("cityList", cityList);
+        model.addAttribute("township", townshipModel);
+        return "township/township_edit";
     }
 
     @GetMapping("/delete/{id}")
     public String delete(@PathVariable("id") long id, RedirectAttributes redirectAttributes) {
+        Township township = townshipService.findById(id);
 
-        Optional<Township> township = townshipService.findById(id);
-
-        if(township.isPresent()) {
-            List<IndustrialZone> industrialZoneList = township.get().getIndustrialZoneList();
-
-            if(!industrialZoneList.isEmpty()) {
-                industrialZoneService.deleteTownshipByTownshipId(id);
+        if (!Objects.isNull(township)) {
+            List<IndustrialZone> industrialZoneList = township.getIndustrialZoneList();
+            if (industrialZoneList.isEmpty()) {
+                townshipService.deleteById(id);
+                redirectAttributes.addFlashAttribute("deleted_success", true);
+            } else {
+                redirectAttributes.addFlashAttribute("found_industrial_zone", true);
             }
-
-            townshipService.deleteById(id);
-            redirectAttributes.addFlashAttribute("deleted_success", true);
-        }
-        else {
+        } else {
             redirectAttributes.addFlashAttribute("township_not_found", true);
         }
-
-        return "redirect:/api/township/";
-
+        return "redirect:/api/township/list";
     }
 
 }

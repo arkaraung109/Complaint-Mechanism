@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>VLCA</title>
+    <div th:replace="~{fragments/include :: include}"></div>
+    <script th:src="@{/js/main.js}"></script>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+    <main id="main" class="main">
+        <section class="section">
+            <div class="row">
+                <div class="col-lg-3 col-sm-6">
+                    <div class="card-box bg-blue">
+                        <div class="inner">
+                            <h3 th:text="${companyCount}"></h3>
+                            <p>Total Company</p>
+                        </div>
+                        <div class="icon">
+                            <i class="bi bi-building" aria-hidden="true"></i>
+                        </div>
+                        <a th:href="@{/api/company/list}" class="card-box-footer">View More <i class="fa fa-arrow-circle-right"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                    <div class="card-box bg-blue">
+                        <div class="inner">
+                            <h3 th:text="${complaintTitleCount}"></h3>
+                            <p>Total Complaint Title</p>
+                        </div>
+                        <div class="icon">
+                            <i class="bi bi-chat-square-text" aria-hidden="true"></i>
+                        </div>
+                        <a th:href="@{/api/complaintTitle/list}" class="card-box-footer">View More <i class="fa fa-arrow-circle-right"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                    <div class="card-box bg-blue">
+                        <div class="inner">
+                            <h3 th:text="${allComplaintCount}"></h3>
+                            <p>Total Complaint</p>
+                        </div>
+                        <div class="icon">
+                            <i class="bi bi-envelope-fill" aria-hidden="true"></i>
+                        </div>
+                        <a th:href="@{/api/complaint/list/all}" class="card-box-footer">View More <i class="fa fa-arrow-circle-right"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                    <div class="card-box bg-green">
+                        <div class="inner">
+                            <h3 th:text="${readComplaintCount}"></h3>
+                            <p>Read Complaint</p>
+                        </div>
+                        <div class="icon">
+                            <i class="bi bi-envelope-open" aria-hidden="true"></i>
+                        </div>
+                        <a th:href="@{/api/complaint/list/read}" class="card-box-footer">View More <i class="fa fa-arrow-circle-right"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-3 col-sm-6">
+                    <div class="card-box bg-orange">
+                        <div class="inner">
+                            <h3 th:text="${unreadComplaintCount}"></h3>
+                            <p>Unread Complaint</p>
+                        </div>
+                        <div class="icon">
+                            <i class="bi bi-envelope" aria-hidden="true"></i>
+                        </div>
+                        <a th:href="@{/api/complaint/list/unread}" class="card-box-footer">View More <i class="fa fa-arrow-circle-right"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                    <div class="card-box bg-green">
+                        <div class="inner">
+                            <h3 th:text="${acceptedComplaintCount}"></h3>
+                            <p>Accepted Complaint</p>
+                        </div>
+                        <div class="icon">
+                            <i class="bi bi-envelope-check" aria-hidden="true"></i>
+                        </div>
+                        <a th:href="@{/api/complaint/list/accepted}" class="card-box-footer">View More <i class="fa fa-arrow-circle-right"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                    <div class="card-box bg-red">
+                        <div class="inner">
+                            <h3 th:text="${rejectedComplaintCount}"></h3>
+                            <p>Rejected Complaint</p>
+                        </div>
+                        <div class="icon">
+                            <i class="bi bi-envelope-slash" aria-hidden="true"></i>
+                        </div>
+                        <a th:href="@{/api/complaint/list/rejected}" class="card-box-footer">View More <i class="fa fa-arrow-circle-right"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                    <div class="card-box bg-orange">
+                        <div class="inner">
+                            <h3 th:text="${pendingComplaintCount}"></h3>
+                            <p>Pending Complaint</p>
+                        </div>
+                        <div class="icon">
+                            <i class="bi bi-envelope-exclamation" aria-hidden="true"></i>
+                        </div>
+                        <a th:href="@{/api/complaint/list/pending}" class="card-box-footer">View More <i class="fa fa-arrow-circle-right"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-3 col-sm-6">
+                    <div class="card-box bg-green">
+                        <div class="inner">
+                            <h3 th:text="${solvedComplaintCount}"></h3>
+                            <p>Solved Complaint</p>
+                        </div>
+                        <div class="icon">
+                            <i class="bi bi-check-circle" aria-hidden="true"></i>
+                        </div>
+                        <a th:href="@{/api/complaint/list/solved}" class="card-box-footer">View More <i class="fa fa-arrow-circle-right"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                    <div class="card-box bg-orange">
+                        <div class="inner">
+                            <h3 th:text="${unsolvedComplaintCount}"></h3>
+                            <p>Unsolved Complaint</p>
+                        </div>
+                        <div class="icon">
+                            <i class="bi bi-question-circle" aria-hidden="true"></i>
+                        </div>
+                        <a th:href="@{/api/complaint/list/unsolved}" class="card-box-footer">View More <i class="fa fa-arrow-circle-right"></i></a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <script th:inline="javascript">
+        $(document).ready(function() {
+
+        <!-- Make Nav Item Active -->
+            $("#sidebar-nav").children("li:nth-child(1)").children("a").removeClass("collapsed");
+        <!-- End -->
+
+        });
+
+    </script>
+</body>
+</html>

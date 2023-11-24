@@ -11,7 +11,7 @@ public class FileUploadExceptionAdvice {
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public String handleMaxSizeException(RedirectAttributes redirectAttributes) {
         redirectAttributes.addFlashAttribute("file_size_exceeded", true);
-        return "redirect:/api/complaintForm/";
+        return "redirect:/api/complaint/add";
     }
 
 }

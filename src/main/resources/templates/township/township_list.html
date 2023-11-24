@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Township List</title>
+    <div th:replace="~{fragments/include :: include}"></div>
+    <script th:src="@{/js/main.js}"></script>
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+<main id="main" class="main">
+    <div class="pagetitle">
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a th:href="@{/}"><i class="fa-solid fa-house"></i><span class="ms-1">Welcome</span></a>
+                </li>
+                <li class="breadcrumb-item"><a th:href="@{/api/township/list}">Township</a></li>
+            </ol>
+        </nav>
+    </div>
+    <section class="section">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Township Searching</h5>
+                <form th:action="@{/api/township/list}" id="searchForm">
+                    <div class="row mb-4">
+                        <div class="col-3">
+                            <label for="cityName" class="form-label">Search by city</label>
+                            <select class="form-select" id="cityName" name="cityName">
+                                <option value="" selected>All cities</option>
+                                <option th:each="c : ${cityNameList}" th:text="${c}" th:value="${c}"
+                                        th:selected="${c == cityName}"></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2 d-flex justify-content-end">
+                        <button type="submit" class="btn" style="background:#49b7bf; color:white;">Search</button>
+                        <button type="button" id="btn-reset" class="btn" style="background:#f56e70; color:white;">
+                            Reset
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="clearfix">
+                    <h5 class="card-title float-start">Township List</h5>
+                    <h5 class="card-title float-end"><a th:href="@{/api/township/add}" class="text-dark"><i
+                            class="fa-solid fa-plus fa-lg me-2"></i>Add new township</a></h5>
+                </div>
+                <div class="clearfix mb-3">
+                    <div class="float-end mb-2">
+                        <label for="pageSize" class="form-label mt-1">Entries per page:&nbsp;&nbsp;</label>
+                        <select name="pageSize" th:value="${pageSize}"
+                                class="form-select w-auto float-end" id="pageSize">
+                            <option th:each="s : ${ {5, 10, 15, 20} }" th:value="${s}" th:text="${s}"
+                                    th:selected="${s == pageSize}"></option>
+                        </select>
+                    </div>
+                    <div class="float-start input-group" style="width: 300px">
+                        <input id="keyword" type="text" name="keyword" th:value="${keyword}" class="form-control"
+                               placeholder="&#128269; Filter Search">
+                        <button type="button" id="btn-filter-search" class="btn" style="background:#49b7bf; color:white;">Search</button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <caption th:unless="${townshipList.isEmpty()}">Showing [[${pageSize * (currentPage - 1) + 1}]] to [[${pageSize * (currentPage - 1) +
+                            pageSize}]] of Total [[${totalItems}]] Entries
+                        </caption>
+                        <thead>
+                        <tr class="table-dark">
+                            <th>#</th>
+                            <th>Township Name</th>
+                            <th>City Name</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="township, state : ${townshipList}">
+                            <td th:text="${township.id}" hidden></td>
+                            <td th:text="${pageSize * (currentPage - 1) + state.index + 1}"></td>
+                            <td th:text="${township.name}"></td>
+                            <td th:text="${township.city?.name}"></td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a th:href="@{'/api/township/edit/' + ${township.id}}" class="btn btn-edit">Edit</a>
+                                    <button type="button" class="btn btn-delete">Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <h4 class="card-title text-danger text-center" th:if="${townshipList.isEmpty()}">No record found!</h4>
+                <div th:replace="~{fragments/paging :: townshipPagination}" th:unless="${townshipList.isEmpty()}"></div>
+            </div>
+        </div>
+    </section>
+</main>
+<script th:inline="javascript">
+    $(document).ready(function() {
+
+    <!-- Make Nav Item Active -->
+        $("#sidebar-nav").children("li:nth-child(2)").children("a").removeClass("collapsed");
+        $("#settings-nav").addClass("show");
+        $("#settings-nav").children("li:nth-child(2)").children("a").addClass("active");
+    <!-- End -->
+
+    <!-- Search Boxes in Select Dropdown -->
+        var cityName = document.querySelector("#cityName");
+        dselect(cityName, {search: true});
+    <!-- End -->
+
+    <!-- Alert Boxes -->
+        if([[${updated_success}]]) {
+            iziToast.success({
+                color: 'blue',
+                title: 'Done',
+                message: 'Successfully Updated!',
+                position: 'topCenter'
+            });
+        }
+
+        if([[${deleted_success}]]) {
+            iziToast.success({
+                color: 'red',
+                title: 'Done',
+                message: 'Successfully Deleted!',
+                position: 'topCenter'
+            });
+        }
+
+        if([[${township_not_found}]]) {
+            iziToast.error({
+                color: 'red',
+                title: 'Failed!',
+                message: 'This township is not found!',
+                position: 'topCenter'
+            });
+        }
+
+        if([[${found_industrial_zone}]]) {
+            iziToast.error({
+                color: 'red',
+                title: 'Failed!',
+                message: 'Please delete industrial zones included in this township first!',
+                position: 'topCenter'
+            });
+        }
+    <!-- End -->
+
+    <!-- When page size select box is changed -->
+        $("#pageSize").change(function() {
+            var cityName = $("#cityName").val();
+            var keyword = $("#keyword").val();
+            var pageSize = $(this).val();
+            window.location = "/api/township/list?cityName=" + cityName + "&keyword=" + keyword + "&pageSize=" + pageSize;
+        });
+    <!-- End -->
+
+    <!-- When search button from filter search box is clicked -->
+        $("#btn-filter-search").on("click", function() {
+            var cityName = $("#cityName").val();
+            var keyword = $("#keyword").val();
+            var pageSize = $("#pageSize option:selected").val();
+            window.location = "/api/township/list?cityName=" + cityName + "&keyword=" + keyword + "&pageSize=" + pageSize;
+        });
+    <!-- End -->
+
+    <!-- When delete button is clicked -->
+        $(document).delegate(".btn-delete", "click", function() {
+            event.preventDefault();
+            var parent = $(this).parent().parent().parent();
+            var id = parent.children("td:nth-child(1)").html();
+
+            $.confirm({
+                title: 'Confirm!',
+                content: "Are you sure to delete?",
+                type: 'red',
+                autoClose: 'no|10000',
+                buttons: {
+                    yes: {
+                        btnClass: 'btn-danger',
+                        action: function () {
+                            window.location = "/api/township/delete/" + id;
+                        }
+                    },
+                    no: function () {}
+                }
+            });
+        });
+    <!-- End -->
+
+    <!-- When reset button is clicked -->
+        $("#btn-reset").on("click", function() {
+            var pageSize = $("#pageSize").val();
+            pageSize = pageSize == undefined ? 5 : pageSize;
+            window.location = "/api/township/list?pageSize=" + pageSize;
+        });
+    <!-- End -->
+
+    });
+</script>
+</body>
+</html>

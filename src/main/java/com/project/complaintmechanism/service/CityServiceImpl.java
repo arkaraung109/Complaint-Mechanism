@@ -5,6 +5,7 @@ import com.project.complaintmechanism.model.CityModel;
 import com.project.complaintmechanism.repository.CityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -15,11 +16,17 @@ import java.util.Optional;
 public class CityServiceImpl implements CityService {
 
     @Autowired
-    CityRepository cityRepository;
+    private CityRepository cityRepository;
 
     @Override
     public boolean existsByName(String cityName) {
         return cityRepository.existsByName(cityName);
+    }
+
+    @Override
+    public City findById(long id) {
+        Optional<City> optional = cityRepository.findById(id);
+        return optional.orElse(null);
     }
 
     @Override
@@ -28,22 +35,26 @@ public class CityServiceImpl implements CityService {
     }
 
     @Override
-    public Optional<City> findById(long id) {
-        return cityRepository.findById(id);
+    public List<City> findAll() {
+        return cityRepository.findAll();
     }
 
     @Override
-    public Page<City> findByPage(Pageable paging) {
-        return cityRepository.findAllByOrderByNameAsc(paging);
+    public Page<City> findByPage(String keyword, int pageNum, int pageSize) {
+        Pageable paging = PageRequest.of(pageNum - 1, pageSize);
+        return cityRepository.findByPageWithKeyword(keyword, paging);
     }
 
     @Override
-    public Page<City> findByPageWithCityName(String keyword, Pageable paging) {
-        return cityRepository.findByNameStartingWithIgnoreCaseOrderByNameAsc(keyword, paging);
+    public void save(CityModel cityModel) {
+        City city = City.builder()
+                .name(cityModel.getName())
+                .build();
+        cityRepository.save(city);
     }
 
     @Override
-    public void saveOrUpdate(CityModel cityModel) {
+    public void update(CityModel cityModel) {
         City city = City.builder()
                 .id(cityModel.getId())
                 .name(cityModel.getName())

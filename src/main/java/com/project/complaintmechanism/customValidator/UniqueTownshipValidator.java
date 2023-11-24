@@ -9,17 +9,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class UniqueTownshipValidator implements ConstraintValidator<UniqueTownship, TownshipModel> {
 
     @Autowired
-    TownshipService townshipService;
+    private TownshipService townshipService;
 
     @Override
     public boolean isValid(TownshipModel townshipModel, ConstraintValidatorContext constraintValidatorContext) {
+        long cityId = townshipModel.getCityId();
         String townshipName = townshipModel.getName();
-        String cityName = townshipModel.getCityName();
         constraintValidatorContext.disableDefaultConstraintViolation();
         constraintValidatorContext.buildConstraintViolationWithTemplate(constraintValidatorContext.getDefaultConstraintMessageTemplate())
                                   .addPropertyNode( "name" )
                                   .addConstraintViolation();
-        return !townshipService.findExistsByCityName(cityName, townshipName);
+        return !townshipService.findExistsByCityIdAndTownshipName(cityId, townshipName);
     }
 
 }

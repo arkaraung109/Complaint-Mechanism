@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>City Add Form</title>
+    <div th:replace="~{fragments/include :: include}"></div>
+    <script th:src="@{/js/main.js}"></script>
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+<main id="main" class="main">
+    <div class="pagetitle">
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a th:href="@{/}"><i class="fa-solid fa-house"></i><span class="ms-1">Welcome</span></a>
+                </li>
+                <li class="breadcrumb-item"><a th:href="@{/api/city/list}">City</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/api/city/add}">Add</a></li>
+            </ol>
+        </nav>
+    </div>
+    <section class="section">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">City Add Form</h5>
+                <form th:object="${city}" th:action="@{/api/city/add}" id="submitForm" method="POST">
+                    <div class="row mb-4">
+                        <div class="col-4"></div>
+                        <div class="col-4">
+                            <label for="cityName" class="form-label">City Name<span class="text-danger"> *</span></label>
+                            <input type="text" class="form-control" id="cityName" th:field="*{name}">
+                            <span class="form-text text-danger" th:if="${#fields.hasErrors('name')}"
+                                  th:errors="*{name}"></span>
+                        </div>
+                        <div class="col-4"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4"></div>
+                        <div class="col-4 d-grid gap-2 d-flex justify-content-end">
+                            <button type="submit" class="btn btn-add" style="background:#49b7bf; color:white;">Add</button>
+                            <a th:href="@{/api/city/add}" class="btn" style="background:#f56e70; color:white;">Reset</a>
+                            <a th:href="@{'/api/city/list?keyword=' + ${#ctx.session.keyword} + '&pageNum=' + ${#ctx.session.pageNum} + '&pageSize=' + ${#ctx.session.pageSize}}" class="btn" style="background:orange; color:white;">Back</a>
+                        </div>
+                        <div class="col-4"></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+</main>
+<script th:inline="javascript">
+    $(document).ready(function() {
+
+    <!-- Make Nav Item Active -->
+        $("#sidebar-nav").children("li:nth-child(2)").children("a").removeClass("collapsed");
+        $("#settings-nav").addClass("show");
+        $("#settings-nav").children("li:nth-child(1)").children("a").addClass("active");
+    <!-- End -->
+
+    <!-- Alert Boxes -->
+        if([[${added_success}]]) {
+            iziToast.success({
+                title: 'Done',
+                message: 'Successfully Added!',
+                position: 'topCenter'
+            });
+        }
+
+        if([[${city_not_found}]]) {
+            iziToast.error({
+                color: 'red',
+                title: 'Failed!',
+                message: 'This city is not found!',
+                position: 'topCenter'
+            });
+        }
+    <!-- End -->
+
+    <!-- When add button is clicked -->
+        $(".btn-add").click(function(event) {
+            event.preventDefault();
+
+            $.confirm({
+                title: 'Confirm!',
+                content: 'Are you sure to add?',
+                type: 'green',
+                autoClose: 'no|10000',
+                buttons: {
+                    yes: {
+                        btnClass: 'btn-success',
+                        action: function () {
+                            $("#submitForm").submit();
+                        }
+                    },
+                    no: function () {}
+                }
+            });
+        });
+    <!-- End -->
+
+    });
+</script>
+</body>
+</html>

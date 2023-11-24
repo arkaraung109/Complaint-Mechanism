@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 public class UniqueCityValidator implements ConstraintValidator<UniqueCity, String> {
 
     @Autowired
-    CityService cityService;
+    private CityService cityService;
 
     @Override
     public boolean isValid(String name, ConstraintValidatorContext constraintValidatorContext) {

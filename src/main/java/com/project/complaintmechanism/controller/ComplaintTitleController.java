@@ -1,25 +1,21 @@
 package com.project.complaintmechanism.controller;
 
-import com.project.complaintmechanism.entity.ComplaintForm;
+import com.project.complaintmechanism.entity.Complaint;
 import com.project.complaintmechanism.entity.ComplaintTitle;
 import com.project.complaintmechanism.model.ComplaintTitleModel;
-import com.project.complaintmechanism.repository.ComplaintFormRepository;
-import com.project.complaintmechanism.service.ComplaintFormService;
 import com.project.complaintmechanism.service.ComplaintTitleService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.Set;
 
 @Controller
@@ -27,107 +23,88 @@ import java.util.Set;
 public class ComplaintTitleController {
 
     @Autowired
-    ComplaintFormService complaintFormService;
-    @Autowired
-    ComplaintTitleService complaintTitleService;
-    @Autowired
-    private ComplaintFormRepository complaintFormRepository;
+    private ComplaintTitleService complaintTitleService;
 
-    @GetMapping("/")
-    public String showList(Model model) {
-
-        model.addAttribute("complaintTitle", new ComplaintTitleModel());
-        return getByPage(model, null, 1, 5);
-
-    }
-
-    @GetMapping("/page")
-    public String getPaginated(Model model, @RequestParam(required = false) String keyword, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "5") int size) {
-
-        model.addAttribute("complaintTitle", new ComplaintTitleModel());
-        return getByPage(model, keyword, page, size);
-
-    }
-
-    public String getByPage(Model model, String keyword, int page, int size) {
-
-        Pageable paging = PageRequest.of(page - 1, size);
-        Page<ComplaintTitle> complaintTitlePage;
-
-        if(keyword == null || keyword.equalsIgnoreCase("")) {
-            complaintTitlePage = complaintTitleService.findByPage(paging);
-        }
-        else {
-            complaintTitlePage = complaintTitleService.findByPageWithComplaintTitleName(keyword, paging);
-            model.addAttribute("keyword", keyword);
-        }
-
+    @GetMapping("/list")
+    public String navigateToListPage(@RequestParam(defaultValue = "") String keyword, @RequestParam(defaultValue = "1") int pageNum, @RequestParam(defaultValue = "5") int pageSize, Model model, HttpSession httpSession) {
+        Page<ComplaintTitle> complaintTitlePage = complaintTitleService.findByPage(keyword, pageNum, pageSize);
         List<ComplaintTitle> complaintTitleList = complaintTitlePage.getContent();
+
+        httpSession.setAttribute("keyword", keyword);
+        httpSession.setAttribute("pageNum", pageNum);
+        httpSession.setAttribute("pageSize", pageSize);
+
         model.addAttribute("complaintTitleList", complaintTitleList);
+        model.addAttribute("keyword", keyword);
         model.addAttribute("currentPage", complaintTitlePage.getNumber() + 1);
         model.addAttribute("totalItems", complaintTitlePage.getTotalElements());
         model.addAttribute("totalPages", complaintTitlePage.getTotalPages());
-        model.addAttribute("pageSize", size);
-        return "complaint_title_list";
+        model.addAttribute("pageSize", pageSize);
+        return "complaint_title/complaint_title_list";
+    }
 
+    @GetMapping("/add")
+    public String navigateToAddPage(Model model) {
+        model.addAttribute("complaintTitle", new ComplaintTitleModel());
+        return "complaint_title/complaint_title_add";
     }
 
     @PostMapping("/add")
     public String add(@Valid @ModelAttribute("complaintTitle") ComplaintTitleModel complaintTitleModel, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
-
         if (!result.hasErrors()) {
-            complaintTitleService.saveOrUpdate(complaintTitleModel);
+            complaintTitleService.save(complaintTitleModel);
             redirectAttributes.addFlashAttribute("added_success", true);
-            return "redirect:/api/complaintTitle/";
+            return "redirect:/api/complaintTitle/add";
         }
-        return getByPage(model, null, 1, 5);
-
+        model.addAttribute("complaintTitle", complaintTitleModel);
+        return "complaint_title/complaint_title_add";
     }
 
-    @PostMapping("/update/{id}")
-    public String update(@PathVariable("id") long id, @Valid @ModelAttribute("complaintTitle") ComplaintTitleModel complaintTitleModel, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
+    @GetMapping("/edit/{id}")
+    public String navigateToEditPage(@PathVariable("id") long id, Model model, RedirectAttributes redirectAttributes) {
+        ComplaintTitle complaintTitle = complaintTitleService.findById(id);
 
-        Optional<ComplaintTitle> complaintTitle = complaintTitleService.findById(id);
-
-        if(complaintTitle.isPresent()) {
-            if(!result.hasErrors())  {
-                complaintTitleModel.setId(id);
-                complaintTitleService.saveOrUpdate(complaintTitleModel);
-                redirectAttributes.addFlashAttribute("updated_success", true);
-                return "redirect:/api/complaintTitle/";
-            }
-
-            return getByPage(model, null, 1, 5);
-        }
-        else {
+        if (!Objects.isNull(complaintTitle)) {
+            ComplaintTitleModel complaintTitleModel = ComplaintTitleModel.builder()
+                    .id(complaintTitle.getId())
+                    .name(complaintTitle.getName())
+                    .build();
+            model.addAttribute("complaintTitle", complaintTitleModel);
+            return "complaint_title/complaint_title_edit";
+        } else {
             redirectAttributes.addFlashAttribute("complaint_title_not_found", true);
-            return "redirect:/api/complaintTitle/";
+            return "redirect:/api/complaintTitle/list";
+        }
+    }
+
+    @PostMapping("/edit")
+    public String update(@Valid @ModelAttribute("complaintTitle") ComplaintTitleModel complaintTitleModel, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
+        if (!result.hasErrors()) {
+            complaintTitleService.update(complaintTitleModel);
+            redirectAttributes.addFlashAttribute("updated_success", true);
+            return "redirect:/api/complaintTitle/list";
         }
 
+        model.addAttribute("complaintTitle", complaintTitleModel);
+        return "complaint_title/complaint_title_edit";
     }
 
     @GetMapping("/delete/{id}")
-    public String delete(@PathVariable("id") long id, Model model, RedirectAttributes redirectAttributes) {
+    public String delete(@PathVariable("id") long id, RedirectAttributes redirectAttributes) {
+        ComplaintTitle complaintTitle = complaintTitleService.findById(id);
 
-        Optional<ComplaintTitle> complaintTitle = complaintTitleService.findById(id);
-
-        if(complaintTitle.isPresent()) {
-            Set<ComplaintForm> complaintFormSet = complaintTitle.get().getComplaintFormSet();
-
-            for(ComplaintForm c : complaintFormSet) {
-                c.setComplaintTitleSet(new HashSet<>());
-                complaintFormRepository.save(c);
+        if (!Objects.isNull(complaintTitle)) {
+            Set<Complaint> complaintSet = complaintTitle.getComplaintSet();
+            if (complaintSet.isEmpty()) {
+                complaintTitleService.deleteById(id);
+                redirectAttributes.addFlashAttribute("deleted_success", true);
+            } else {
+                redirectAttributes.addFlashAttribute("found_complaint_form", true);
             }
-
-            complaintTitleService.deleteById(id);
-            redirectAttributes.addFlashAttribute("deleted_success", true);
-        }
-        else {
+        } else {
             redirectAttributes.addFlashAttribute("complaint_title_not_found", true);
         }
-
-        return "redirect:/api/complaintTitle/";
-
+        return "redirect:/api/complaintTitle/list";
     }
 
 }

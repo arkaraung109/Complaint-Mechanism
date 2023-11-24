@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Complaint Title List</title>
+    <div th:replace="~{fragments/include :: include}"></div>
+    <script th:src="@{/js/main.js}"></script>
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+<main id="main" class="main">
+    <div class="pagetitle">
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a th:href="@{/}"><i class="fa-solid fa-house"></i><span class="ms-1">Welcome</span></a>
+                </li>
+                <li class="breadcrumb-item"><a th:href="@{/api/complaintTitle/list}">Complaint Title</a></li>
+            </ol>
+        </nav>
+    </div>
+    <section class="section">
+        <div class="card">
+            <div class="card-body">
+                <div class="clearfix">
+                    <h5 class="card-title float-start">Complaint Title List</h5>
+                    <h5 class="card-title float-end"><a th:href="@{/api/complaintTitle/add}" class="text-dark"><i
+                            class="fa-solid fa-plus fa-lg me-2"></i>Add new complaint title</a></h5>
+                </div>
+                <div class="clearfix mb-3">
+                    <div class="float-end mb-2">
+                        <label for="pageSize" class="form-label mt-1">Entries per page:&nbsp;&nbsp;</label>
+                        <select name="pageSize" th:value="${pageSize}"
+                                class="form-select w-auto float-end" id="pageSize">
+                            <option th:each="s : ${ {5, 10, 15, 20} }" th:value="${s}" th:text="${s}"
+                                    th:selected="${s == pageSize}"></option>
+                        </select>
+                    </div>
+                    <div class="float-start input-group" style="width: 300px">
+                        <input id="keyword" type="text" name="keyword" th:value="${keyword}" class="form-control"
+                               placeholder="&#128269; Filter Search">
+                        <button type="button" id="btn-filter-search" class="btn" style="background:#49b7bf; color:white;">Search</button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <caption th:unless="${complaintTitleList.isEmpty()}">Showing [[${pageSize * (currentPage - 1) +
+                            1}]] to [[${pageSize * (currentPage - 1) +
+                            pageSize}]] of Total [[${totalItems}]] Entries
+                        </caption>
+                        <thead>
+                        <tr class="table-dark">
+                            <th>#</th>
+                            <th>Complaint Title Name</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="complaintTitle, state : ${complaintTitleList}">
+                            <td th:text="${complaintTitle.id}" hidden></td>
+                            <td th:text="${pageSize * (currentPage - 1) + state.index + 1}"></td>
+                            <td th:text="${complaintTitle.name}"></td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a th:href="@{'/api/complaintTitle/edit/' + ${complaintTitle.id}}"
+                                       class="btn btn-edit">Edit</a>
+                                    <button type="button" class="btn btn-delete">Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <h4 class="card-title text-danger text-center" th:if="${complaintTitleList.isEmpty()}">No record
+                    found!</h4>
+                <div th:replace="~{fragments/paging :: complaintTitlePagination}"
+                     th:unless="${complaintTitleList.isEmpty()}"></div>
+            </div>
+        </div>
+    </section>
+</main>
+<script th:inline="javascript">
+    $(document).ready(function() {
+
+    <!-- Make Nav Item Active -->
+        $("#sidebar-nav").children("li:nth-child(2)").children("a").removeClass("collapsed");
+        $("#settings-nav").addClass("show");
+        $("#settings-nav").children("li:nth-child(5)").children("a").addClass("active");
+    <!-- End -->
+
+    <!-- Alert Boxes -->
+        if([[${updated_success}]]) {
+            iziToast.success({
+                color: 'blue',
+                title: 'Done',
+                message: 'Successfully Updated!',
+                position: 'topCenter'
+            });
+        }
+
+        if([[${deleted_success}]]) {
+            iziToast.success({
+                color: 'red',
+                title: 'Done',
+                message: 'Successfully Deleted!',
+                position: 'topCenter'
+            });
+        }
+
+        if([[${complaint_title_not_found}]]) {
+            iziToast.error({
+                color: 'red',
+                title: 'Failed!',
+                message: 'This complaint title is not found!',
+                position: 'topCenter'
+            });
+        }
+
+        if([[${found_complaint_form}]]) {
+            iziToast.error({
+                color: 'red',
+                title: 'Failed!',
+                message: 'Please delete complaint forms which use this complaint title first!',
+                position: 'topCenter'
+            });
+        }
+    <!-- End -->
+
+    <!-- When page size select box is changed -->
+        $("#pageSize").change(function() {
+            var keyword = $("#keyword").val();
+            var pageSize = $(this).val();
+            window.location = "/api/complaintTitle/list?keyword=" + keyword + "&pageSize=" + pageSize;
+        });
+    <!-- End -->
+
+    <!-- When search button from filter search box is clicked -->
+        $("#btn-filter-search").on("click", function() {
+            var keyword = $("#keyword").val();
+            var pageSize = $("#pageSize option:selected").val();
+            window.location = "/api/complaintTitle/list?keyword=" + keyword + "&pageSize=" + pageSize;
+        });
+    <!-- End -->
+
+    <!-- When delete button is clicked -->
+        $(document).delegate(".btn-delete", "click", function() {
+            event.preventDefault();
+            var parent = $(this).parent().parent().parent();
+            var id = parent.children("td:nth-child(1)").html();
+
+            $.confirm({
+                title: 'Confirm!',
+                content: "Are you sure to delete?",
+                type: 'red',
+                autoClose: 'no|10000',
+                buttons: {
+                    yes: {
+                        btnClass: 'btn-danger',
+                        action: function () {
+                            window.location = "/api/complaintTitle/delete/" + id;
+                        }
+                    },
+                    no: function () {}
+                }
+            });
+        });
+    <!-- End -->
+
+    <!-- When reset button is clicked -->
+        $("#btn-reset").on("click", function() {
+            var pageSize = $("#pageSize").val();
+            pageSize = pageSize == undefined ? 5 : pageSize;
+            window.location = "/api/complaintTitle/list?pageSize=" + pageSize;
+        });
+    <!-- End -->
+
+    });
+</script>
+</body>
+</html>

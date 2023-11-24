@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Industrial Zone Edit Form</title>
+    <div th:replace="~{fragments/include :: include}"></div>
+    <script th:src="@{/js/main.js}"></script>
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+<main id="main" class="main">
+    <div class="pagetitle">
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a th:href="@{/}"><i class="fa-solid fa-house"></i><span class="ms-1">Welcome</span></a>
+                </li>
+                <li class="breadcrumb-item"><a th:href="@{/api/industrialZone/list}">Industrial Zone</a></li>
+                <li class="breadcrumb-item"><a th:href="@{'/api/industrialZone/edit/' + ${industrialZone.id}}">Edit</a></li>
+            </ol>
+        </nav>
+    </div>
+    <section class="section">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Industrial Zone Edit Form</h5>
+                <form th:object="${industrialZone}" th:action="@{/api/industrialZone/edit}" id="submitForm" method="POST">
+                    <div class="row mb-4">
+                        <div class="col-4"></div>
+                        <div class="col-4">
+                            <input type="hidden" th:value="*{id}" th:field="*{id}">
+                            <label for="cityName" class="form-label">City<span class="text-danger"> *</span></label>
+                            <select class="form-select" id="cityName" th:field="*{cityId}">
+                                <option value="-1" selected>Choose</option>
+                                <option th:each="c : ${cityList}" th:text="${c.name}" th:value="${c.id}"></option>
+                            </select>
+                            <span class="form-text text-danger" th:if="${#fields.hasErrors('cityId')}"
+                                  th:errors="*{cityId}"></span>
+                        </div>
+                        <div class="col-4"></div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-4"></div>
+                        <div class="col-4">
+                            <label for="townshipName" class="form-label">Township<span class="text-danger"> *</span></label>
+                            <select class="form-select" id="townshipName" th:field="*{townshipId}">
+                                <option value="-1" selected>Choose</option>
+                                <option th:each="t : ${townshipList}" th:text="${t.name}" th:value="${t.id}"></option>
+                            </select>
+                            <span class="form-text text-danger" th:if="${#fields.hasErrors('townshipId')}"
+                                  th:errors="*{townshipId}"></span>
+                        </div>
+                        <div class="col-4"></div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-4"></div>
+                        <div class="col-4">
+                            <label for="industrialZoneName" class="form-label">Industrial Zone Name<span class="text-danger"> *</span></label>
+                            <input type="text" class="form-control" id="industrialZoneName" th:field="*{name}">
+                            <span class="form-text text-danger" th:if="${#fields.hasErrors('name')}"
+                                  th:errors="*{name}"></span>
+                        </div>
+                        <div class="col-4"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4"></div>
+                        <div class="col-4 d-grid gap-2 d-flex justify-content-end">
+                            <button type="submit" class="btn btn-update" style="background:#49b7bf; color:white;">Update
+                            </button>
+                            <a th:href="@{'/api/industrialZone/edit/' + ${industrialZone.id}}" class="btn"
+                               style="background:#f56e70; color:white;">Reset</a>
+                            <a th:href="@{'/api/industrialZone/list?cityName=' + ${#ctx.session.cityName} + '&townshipName=' + ${#ctx.session.townshipName} + '&keyword=' + ${#ctx.session.keyword} + '&pageNum=' + ${#ctx.session.pageNum} + '&pageSize=' + ${#ctx.session.pageSize}}" class="btn" style="background:orange; color:white;">Back</a>
+                        </div>
+                        <div class="col-4"></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+</main>
+<script th:inline="javascript">
+    $(document).ready(function() {
+
+    <!-- Make Nav Item Active -->
+        $("#sidebar-nav").children("li:nth-child(2)").children("a").removeClass("collapsed");
+        $("#settings-nav").addClass("show");
+        $("#settings-nav").children("li:nth-child(3)").children("a").addClass("active");
+    <!-- End -->
+
+    <!-- Search Boxes in Select Dropdown -->
+        var cityName = document.querySelector("#cityName");
+        var townshipName = document.querySelector("#townshipName");
+        dselect(cityName, {search: true});
+        dselect(townshipName, {search: true});
+    <!-- End -->
+
+    <!-- Alert Boxes -->
+        if([[${industrial_zone_not_found}]]) {
+            iziToast.error({
+                color: 'red',
+                title: 'Failed!',
+                message: 'This industrial zone is not found!',
+                position: 'topCenter'
+            });
+        }
+    <!-- End -->
+
+    <!-- When city select box is changed -->
+        $("#cityName").change(function() {
+            var cityId = $("#cityName option:selected").val();
+
+            $.ajax({
+                url: "/api/township/cityId",
+                type: "POST",
+                data: {
+                    "cityId" : cityId
+                },
+                success: function(data) {
+                    $("#townshipName option[value!=-1]").remove();
+                    for(var i = 0; i < data.length; i++) {
+                        $("#townshipName").append(`<option value="${data[i].id}">${data[i].name}</option>`);
+                    }
+                    dselect(townshipName, {search: true});
+                }
+            });
+        });
+    <!-- End -->
+
+    <!-- When update button is clicked -->
+        $(".btn-update").click(function() {
+            event.preventDefault();
+
+            $.confirm({
+                title: 'Confirm!',
+                content: 'Are you sure to update?',
+                type: 'blue',
+                autoClose: 'no|10000',
+                buttons: {
+                    yes: {
+                        btnClass: 'btn-info text-white',
+                        action: function () {
+                            $("#submitForm").submit();
+                        }
+                    },
+                    no: function () {}
+                }
+            });
+        });
+    <!-- End -->
+
+    });
+</script>
+</body>
+</html>

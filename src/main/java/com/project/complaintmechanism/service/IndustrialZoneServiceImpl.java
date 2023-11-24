@@ -1,48 +1,39 @@
 package com.project.complaintmechanism.service;
 
-import com.project.complaintmechanism.entity.City;
 import com.project.complaintmechanism.entity.IndustrialZone;
 import com.project.complaintmechanism.entity.Township;
 import com.project.complaintmechanism.model.IndustrialZoneModel;
-import com.project.complaintmechanism.repository.CityRepository;
 import com.project.complaintmechanism.repository.IndustrialZoneRepository;
-import com.project.complaintmechanism.repository.TownshipRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
 public class IndustrialZoneServiceImpl implements IndustrialZoneService {
 
     @Autowired
-    TownshipRepository townshipRepository;
-    @Autowired
-    IndustrialZoneRepository industrialZoneRepository;
-    @Autowired
-    private CityRepository cityRepository;
+    private IndustrialZoneRepository industrialZoneRepository;
 
     @Override
-    public boolean findExistsByCityNameAndTownshipName(String cityName, String townshipName, String industrialZoneName) {
-        return industrialZoneRepository.findExistsByCityNameAndTownshipName(cityName, townshipName, industrialZoneName) == 1;
+    public boolean findExistsByCityIdAndTownshipIdAndIndustrialZoneName(long cityId, long townshipId, String industrialZoneName) {
+        return industrialZoneRepository.findExistsByCityIdAndTownshipIdAndIndustrialZoneName(cityId, townshipId, industrialZoneName) == 1;
     }
 
     @Override
-    public Optional<IndustrialZone> findById(long id) {
-        return industrialZoneRepository.findById(id);
+    public IndustrialZone findById(long id) {
+        Optional<IndustrialZone> optional = industrialZoneRepository.findById(id);
+        return optional.orElse(null);
     }
 
     @Override
-    public List<IndustrialZone> findByTownshipName(String townshipName) {
-        return industrialZoneRepository.findByTownshipNameOrderByNameAsc(townshipName);
-    }
-
-    @Override
-    public List<IndustrialZone> findByCityNameAndTownshipName(String cityName, String townshipName) {
-        return industrialZoneRepository.findByCityNameAndTownshipName(cityName, townshipName);
+    public List<IndustrialZone> findByTownshipId(long townshipId) {
+        return industrialZoneRepository.findByTownshipIdOrderByNameAsc(townshipId);
     }
 
     @Override
@@ -51,73 +42,50 @@ public class IndustrialZoneServiceImpl implements IndustrialZoneService {
     }
 
     @Override
-    public Page<IndustrialZone> findByPage(Pageable paging) {
-        return industrialZoneRepository.findByPage(paging);
+    public Page<IndustrialZone> findByPage(String cityName, String townshipName, String keyword, int pageNum, int pageSize) {
+        Pageable paging = PageRequest.of(pageNum - 1, pageSize);
+        boolean isCityNameEmpty = Objects.equals(cityName, "");
+        boolean isTownshipNameEmpty = Objects.equals(townshipName, "");
+
+        if(isCityNameEmpty && isTownshipNameEmpty) {
+            return industrialZoneRepository.findByPageWithKeyword(keyword, paging);
+        } else if(!isCityNameEmpty && isTownshipNameEmpty) {
+            return industrialZoneRepository.findByPageWithCityNameAndKeyword(cityName, keyword, paging);
+        } else if(isCityNameEmpty && !isTownshipNameEmpty) {
+            return industrialZoneRepository.findByPageWithTownshipNameAndKeyword(townshipName, keyword, paging);
+        } else {
+            return industrialZoneRepository.findByPageWithCityNameAndTownshipNameAndKeyword(cityName, townshipName, keyword, paging);
+        }
     }
 
     @Override
-    public Page<IndustrialZone> findByPageWithIndustrialZoneName(String keyword, Pageable paging) {
-        return industrialZoneRepository.findByPageWithIndustrialZoneName(keyword, paging);
-    }
-
-    @Override
-    public Page<IndustrialZone> findByPageWithCityName(String cityName, Pageable paging) {
-        return industrialZoneRepository.findByPageWithCityName(cityName, paging);
-    }
-
-    @Override
-    public Page<IndustrialZone> findByPageWithTownshipName(String townshipName, Pageable paging) {
-        return industrialZoneRepository.findByPageWithTownshipName(townshipName, paging);
-    }
-
-    @Override
-    public Page<IndustrialZone> findByPageWithCityNameAndIndustrialZoneName(String cityName, String keyword, Pageable paging) {
-        return industrialZoneRepository.findByPageWithCityNameAndIndustrialZoneName(cityName, keyword, paging);
-    }
-
-    @Override
-    public Page<IndustrialZone> findByPageWithTownshipNameAndIndustrialZoneName(String townshipName, String keyword, Pageable paging) {
-        return industrialZoneRepository.findByPageWithTownshipNameAndIndustrialZoneName(townshipName, keyword, paging);
-    }
-
-    @Override
-    public Page<IndustrialZone> findByPageWithCityNameAndTownshipName(String cityName, String townshipName, Pageable paging) {
-        return industrialZoneRepository.findByPageWithCityNameAndTownshipName(cityName, townshipName, paging);
-    }
-
-    @Override
-    public Page<IndustrialZone> findByPageWithCityNameAndTownshipNameAndIndustrialZoneName(String cityName, String townshipName, String keyword, Pageable paging) {
-        return industrialZoneRepository.findByPageWithCityNameAndTownshipNameAndIndustrialZoneName(cityName, townshipName, keyword, paging);
-    }
-
-    @Override
-    public void saveOrUpdate(IndustrialZoneModel industrialZoneModel) {
-        City city = City.builder()
-                        .id(cityRepository.findByName(industrialZoneModel.getCityName()).getId())
-                        .name(industrialZoneModel.getCityName())
-                        .build();
+    public void save(IndustrialZoneModel industrialZoneModel) {
         Township township = Township.builder()
-                                    .id(townshipRepository.findByNameAndCityName(industrialZoneModel.getTownshipName(), industrialZoneModel.getCityName()).getId())
-                                    .name(industrialZoneModel.getTownshipName())
-                                    .city(city)
-                                    .build();
-
+                .id(industrialZoneModel.getTownshipId())
+                .build();
         IndustrialZone industrialZone = IndustrialZone.builder()
-                                                      .id(industrialZoneModel.getId())
-                                                      .name(industrialZoneModel.getName())
-                                                      .township(township)
-                                                      .build();
+                .name(industrialZoneModel.getName())
+                .township(township)
+                .build();
+        industrialZoneRepository.save(industrialZone);
+    }
+
+    @Override
+    public void update(IndustrialZoneModel industrialZoneModel) {
+        Township township = Township.builder()
+                .id(industrialZoneModel.getTownshipId())
+                .build();
+        IndustrialZone industrialZone = IndustrialZone.builder()
+                .id(industrialZoneModel.getId())
+                .name(industrialZoneModel.getName())
+                .township(township)
+                .build();
         industrialZoneRepository.save(industrialZone);
     }
 
     @Override
     public void deleteById(long id) {
         industrialZoneRepository.deleteById(id);
-    }
-
-    @Override
-    public void deleteTownshipByTownshipId(long id) {
-        industrialZoneRepository.deleteTownshipByTownshipId(id);
     }
 
 }

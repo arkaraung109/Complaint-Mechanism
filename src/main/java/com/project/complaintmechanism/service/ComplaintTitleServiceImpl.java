@@ -5,10 +5,10 @@ import com.project.complaintmechanism.model.ComplaintTitleModel;
 import com.project.complaintmechanism.repository.ComplaintTitleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,7 +16,7 @@ import java.util.Optional;
 public class ComplaintTitleServiceImpl implements ComplaintTitleService {
 
     @Autowired
-    ComplaintTitleRepository complaintTitleRepository;
+    private ComplaintTitleRepository complaintTitleRepository;
 
     @Override
     public boolean existsByName(String complaintTitleName) {
@@ -24,8 +24,14 @@ public class ComplaintTitleServiceImpl implements ComplaintTitleService {
     }
 
     @Override
-    public Optional<ComplaintTitle> findById(long id) {
-        return complaintTitleRepository.findById(id);
+    public int findCount() {
+        return complaintTitleRepository.findCount();
+    }
+
+    @Override
+    public ComplaintTitle findById(long id) {
+        Optional<ComplaintTitle> optional = complaintTitleRepository.findById(id);
+        return optional.orElse(null);
     }
 
     @Override
@@ -34,32 +40,36 @@ public class ComplaintTitleServiceImpl implements ComplaintTitleService {
     }
 
     @Override
-    public Page<ComplaintTitle> findByPage(Pageable paging) {
-        return complaintTitleRepository.findAllByOrderByNameAsc(paging);
+    public List<ComplaintTitle> findAll() {
+        return complaintTitleRepository.findAll();
     }
 
     @Override
-    public Page<ComplaintTitle> findByPageWithComplaintTitleName(String keyword, Pageable paging) {
-        return complaintTitleRepository.findByNameStartingWithIgnoreCaseOrderByNameAsc(keyword, paging);
+    public Page<ComplaintTitle> findByPage(String keyword, int pageNum, int pageSize) {
+        Pageable paging = PageRequest.of(pageNum - 1, pageSize);
+        return complaintTitleRepository.findByPageWithKeyword(keyword, paging);
     }
 
     @Override
-    public void saveOrUpdate(ComplaintTitleModel complaintTitleModel) {
+    public void save(ComplaintTitleModel complaintTitleModel) {
         ComplaintTitle complaintTitle = ComplaintTitle.builder()
-                                                      .id(complaintTitleModel.getId())
-                                                      .name(complaintTitleModel.getName())
-                                                      .build();
+                .name(complaintTitleModel.getName())
+                .build();
+        complaintTitleRepository.save(complaintTitle);
+    }
+
+    @Override
+    public void update(ComplaintTitleModel complaintTitleModel) {
+        ComplaintTitle complaintTitle = ComplaintTitle.builder()
+                .id(complaintTitleModel.getId())
+                .name(complaintTitleModel.getName())
+                .build();
         complaintTitleRepository.save(complaintTitle);
     }
 
     @Override
     public void deleteById(long id) {
-        Optional<ComplaintTitle> complaintTitleOptional = complaintTitleRepository.findById(id);
-        if(complaintTitleOptional.isPresent()) {
-            ComplaintTitle complaintTitle = complaintTitleOptional.get();
-            complaintTitle.setComplaintFormSet(new HashSet<>());
-            complaintTitleRepository.deleteById(id);
-        }
+        complaintTitleRepository.deleteById(id);
     }
 
 }

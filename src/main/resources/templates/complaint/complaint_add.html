@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Complaint Form</title>
+    <div th:replace="~{fragments/include :: include}"></div>
+</head>
+<body>
+<section class="section">
+    <div class="d-flex justify-content-center mt-4">
+        <div class="card" id="complaint-form">
+            <div class="card-body">
+                <h2 style="text-align:center; margin:45px;">တိုင်ကြားစာ</h2>
+                <form th:object="${complaint}" method="POST" th:action="@{/api/complaint/add}" id="submitForm"
+                      enctype="multipart/form-data" class="mx-auto p-4">
+                    <div class="row mb-5">
+                        <div class="col-6">
+                            <label for="name" class="form-label">အမည်<span class="text-danger"> *</span></label>
+                            <input type="text" class="form-control" id="name" th:field="*{name}">
+                            <span class="form-text text-danger" th:if="${#fields.hasErrors('name')}"
+                                  th:errors="*{name}"></span>
+                        </div>
+                        <div class="col-6">
+                            <label>ကျား / မ<span class="text-danger"> *</span></label>
+                            <br>
+                            <div class="form-check form-check-inline mt-3">
+                                <input class="form-check-input" type="radio" name="gender" id="male" value="Male"
+                                       th:field="*{gender}">
+                                <label class="form-check-label" for="male">ကျား</label>
+                            </div>
+                            <div class="form-check form-check-inline mt-3">
+                                <input class="form-check-input" type="radio" name="gender" id="female" value="Female"
+                                       th:field="*{gender}">
+                                <label class="form-check-label" for="female">မ</label>
+                            </div>
+                            <br>
+                            <span class="form-text text-danger" th:if="${#fields.hasErrors('gender')}"
+                                  th:errors="*{gender}"></span>
+                        </div>
+                    </div>
+                    <div class="row mb-5">
+                        <div class="col-6">
+                            <label for="phone" class="form-label">ဖုန်းနံပါတ်<span
+                                    class="text-danger"> *</span></label>
+                            <input type="text" class="form-control" id="phone" th:field="*{phone}">
+                            <span class="form-text text-danger" th:if="${#fields.hasErrors('phone')}"
+                                  th:errors="*{phone}"></span>
+                        </div>
+                        <div class="col-6">
+                            <label for="email" class="form-label">အီးမေးလ်<span class="text-danger"> *</span></label>
+                            <input type="text" class="form-control" id="email" th:field="*{email}">
+                            <span class="form-text text-danger" th:if="${#fields.hasErrors('email')}"
+                                  th:errors="*{email}"></span>
+                        </div>
+                    </div>
+                    <div class="row mb-5">
+                        <div class="col-6">
+                            <label for="idCardFront" class="form-label">မှတ်ပုံတင်ဓာတ်ပုံ (ရှေ့)<span
+                                    class="text-danger"> *</span></label>
+                            <input class="file form-control" type="file" th:field="*{idCardFront}" accept="image/*"
+                                   id="idCardFront">
+                            <span class="form-text text-danger" th:if="${#fields.hasErrors('idCardFront')}"
+                                  th:errors="*{idCardFront}"></span>
+                        </div>
+                        <div class="col-6">
+                            <label for="idCardBack" class="form-label">မှတ်ပုံတင်ဓာတ်ပုံ (နောက်)<span
+                                    class="text-danger"> *</span></label>
+                            <input class="file form-control" type="file" th:field="*{idCardBack}" accept="image/*"
+                                   id="idCardBack">
+                            <span class="form-text text-danger" th:if="${#fields.hasErrors('idCardBack')}"
+                                  th:errors="*{idCardBack}"></span>
+                        </div>
+                    </div>
+                    <div class="row mb-5">
+                        <div class="col-6">
+                            <label for="cityName" class="form-label">မြို့<span class="text-danger"> *</span></label>
+                            <select class="form-select" id="cityName" th:field="*{cityId}">
+                                <option value="-1" selected>ရွေးခြယ်ပါ</option>
+                                <option th:each="c : ${cityList}" th:text="${c.name}" th:value="${c.id}"></option>
+                            </select>
+                            <span class="form-text text-danger" th:if="${#fields.hasErrors('cityId')}"
+                                  th:errors="*{cityId}"></span>
+                        </div>
+                        <div class="col-6">
+                            <label for="townshipName" class="form-label">မြို့နယ်<span
+                                    class="text-danger"> *</span></label>
+                            <select class="form-select" id="townshipName" th:field="*{townshipId}">
+                                <option value="-1" selected>ရွေးခြယ်ပါ</option>
+                            </select>
+                            <span class="form-text text-danger" th:if="${#fields.hasErrors('townshipId')}"
+                                  th:errors="*{townshipId}"></span>
+                        </div>
+                    </div>
+                    <div class="row mb-5">
+                        <div class="col-6">
+                            <label for="industrialZoneName" class="form-label">စက်မှုဇုန်<span
+                                    class="text-danger"> *</span></label>
+                            <select class="form-select" id="industrialZoneName" th:field="*{industrialZoneId}">
+                                <option value="-1" selected>ရွေးခြယ်ပါ</option>
+                            </select>
+                            <span class="form-text text-danger" th:if="${#fields.hasErrors('industrialZoneId')}"
+                                  th:errors="*{industrialZoneId}"></span>
+                        </div>
+                        <div class="col-6">
+                            <label for="companyName" class="form-label">ကုမ္ပဏီ<span
+                                    class="text-danger"> *</span></label>
+                            <select class="form-select" id="companyName" th:field="*{companyId}">
+                                <option value="-1" selected>ရွေးခြယ်ပါ</option>
+                            </select>
+                            <span class="form-text text-danger" th:if="${#fields.hasErrors('companyId')}"
+                                  th:errors="*{companyId}"></span>
+                        </div>
+                    </div>
+                    <div class="row mb-5">
+                        <div class="col-6">
+                            <label for="ecPhoto1" class="form-label">အလုပ်ခန့်အပ်ခြင်းစာချုပ်ဓာတ်ပုံ (၁)<span
+                                    class="text-danger"> *</span></label>
+                            <input class="file form-control" type="file" th:field="*{ecPhoto1}" accept="image/*"
+                                   id="ecPhoto1">
+                            <span class="form-text text-danger" th:if="${#fields.hasErrors('ecPhoto1')}"
+                                  th:errors="*{ecPhoto1}"></span>
+                        </div>
+                        <div class="col-6">
+                            <label for="ecPhoto2" class="form-label">အလုပ်ခန့်အပ်ခြင်းစာချုပ်ဓာတ်ပုံ (၂)</label>
+                            <input class="file form-control" type="file" th:field="*{ecPhoto2}" accept="image/*"
+                                   id="ecPhoto2">
+                            <span class="form-text text-danger" th:if="${#fields.hasErrors('ecPhoto2')}"
+                                  th:errors="*{ecPhoto2}"></span>
+                        </div>
+                    </div>
+                    <div class="row mb-5">
+                        <div class="col-6">
+                            <label for="complaintTitleName" class="form-label">တိုင်ကြားမှုခေါင်းစဉ်<span
+                                    class="text-danger"> *</span></label>
+                            <select class="form-select" id="complaintTitleName" th:field="*{complaintTitleId}">
+                                <option value="-1" selected>ရွေးခြယ်ပါ</option>
+                                <option th:each="c : ${complaintTitleList}" th:text="${c.name}"
+                                        th:value="${c.id}"></option>
+                            </select>
+                            <span class="form-text text-danger" th:if="${#fields.hasErrors('complaintTitleId')}"
+                                  th:errors="*{complaintTitleId}"></span>
+                        </div>
+                    </div>
+                    <div class="row mb-5">
+                        <div class="col-12">
+                            <label for="description" class="form-label">တိုင်းကြားမည့်အကြောင်းအရာ<span
+                                    class="text-danger"> *</span></label>
+                            <textarea class="form-control" style="height: 150px;" id="description"
+                                      th:field="*{description}"></textarea>
+                            <span class="form-text text-danger" th:if="${#fields.hasErrors('description')}"
+                                  th:errors="*{description}"></span>
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2 d-flex justify-content-end">
+                        <button type="submit" class="btn" style="background:#49b7bf; color:white;" id="btn-submit">
+                            Submit
+                        </button>
+                        <a th:href="@{/api/complaint/add}" class="btn" style="background:#f56e70; color:white;"
+                           id="btn-reset">
+                            Reset
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script th:inline="javascript">
+
+    $(document).ready(function() {
+
+    <!-- Search Boxes in Select Box -->
+        var cityName = document.querySelector("#cityName");
+        var townshipName = document.querySelector("#townshipName");
+        var industrialZoneName = document.querySelector("#industrialZoneName");
+        var companyName = document.querySelector("#companyName");
+        var complaintTitleName = document.querySelector("#complaintTitleName");
+        dselect(cityName, {search: true});
+        dselect(townshipName, {search: true});
+        dselect(industrialZoneName, {search: true});
+        dselect(companyName, {search: true});
+        dselect(complaintTitleName, {search: true});
+    <!-- End -->
+
+    <!-- When file size is too large -->
+        if([[${file_size_exceeded}]]) {
+            $.alert({
+                title: 'Warning!',
+                content: 'File Size is too large!',
+                type: 'red'
+            });
+        }
+    <!-- End -->
+
+    <!-- When city select box is changed -->
+        $("#cityName").change(function() {
+            var cityId = $("#cityName option:selected").val();
+
+            $.ajax({
+                url: "/api/township/cityId",
+                type: "POST",
+                data: {
+                    "cityId" : cityId
+                },
+                success: function(data) {
+                    $("#townshipName option[value!=-1]").remove();
+                    $("#industrialZoneName option[value!=-1]").remove();
+                    $("#companyName option[value!=-1]").remove();
+                    for(var i = 0; i < data.length; i++) {
+                        $("#townshipName").append(`<option value="${data[i].id}">${data[i].name}</option>`);
+                    }
+                    dselect(townshipName, {search: true});
+                    dselect(industrialZoneName, {search: true});
+                    dselect(companyName, {search: true});
+                }
+            });
+        });
+    <!-- End -->
+
+    <!-- When township select box is changed -->
+        $("#townshipName").change(function() {
+            var townshipId = $("#townshipName option:selected").val();
+
+            $.ajax({
+                url: "/api/industrialZone/townshipId",
+                type: "POST",
+                data: {
+                    "townshipId" : townshipId
+                },
+                success: function(data) {
+                    $("#industrialZoneName option[value!=-1]").remove();
+                    $("#companyName option[value!=-1]").remove();
+                    for(var i = 0; i < data.length; i++) {
+                        $("#industrialZoneName").append(`<option value="${data[i].id}">${data[i].name}</option>`);
+                    }
+                    dselect(industrialZoneName, {search: true});
+                    dselect(companyName, {search: true});
+                }
+            });
+        });
+    <!-- End -->
+
+    <!-- When industrial zone select box is changed -->
+        $("#industrialZoneName").change(function() {
+            var industrialZoneId = $("#industrialZoneName option:selected").val();
+
+            $.ajax({
+                url: "/api/company/industrialZoneId",
+                type: "POST",
+                data: {
+                    "industrialZoneId" : industrialZoneId
+                },
+                success: function(data) {
+                    $("#companyName option[value!=-1]").remove();
+                    for(var i = 0; i < data.length; i++) {
+                        $("#companyName").append(`<option value="${data[i].id}">${data[i].name}</option>`);
+                    }
+                    dselect(companyName, {search: true});
+                }
+            });
+        });
+    <!-- End -->
+
+    <!-- When submit button is clicked -->
+        $("#btn-submit").click(function(event) {
+            event.preventDefault();
+
+            $.confirm({
+                title: 'Confirm!',
+                content: 'Are you sure to submit?',
+                type: 'green',
+                autoClose: 'no|10000',
+                buttons: {
+                    yes: {
+                        btnClass: 'btn-success',
+                        action: function () {
+                            $("#submitForm").submit();
+                        }
+                    },
+                    no: function () {}
+                }
+            });
+        });
+    <!-- End -->
+
+    });
+
+</script>
+</body>
+</html>

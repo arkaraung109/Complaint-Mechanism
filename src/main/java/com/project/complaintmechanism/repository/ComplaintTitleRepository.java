@@ -14,12 +14,16 @@ public interface ComplaintTitleRepository extends JpaRepository<ComplaintTitle, 
 
     boolean existsByName(String complaintTitleName);
 
-    ComplaintTitle findByName(String complaintTitleName);
+    @Query(value = "select count(*) from complaint_title",
+            nativeQuery = true)
+    int findCount();
 
     @Query(value = "select distinct(name) from complaint_title order by name", nativeQuery = true)
     List<String> findAllDistinctNameByOrderByNameAsc();
 
-    Page<ComplaintTitle> findAllByOrderByNameAsc(Pageable paging);
+    @Query(value = "select * from complaint_title where name like ?1% order by name",
+            countQuery = "select * from complaint_title where name like ?1% order by name",
+            nativeQuery = true)
+    Page<ComplaintTitle> findByPageWithKeyword(String keyword, Pageable paging);
 
-    Page<ComplaintTitle> findByNameStartingWithIgnoreCaseOrderByNameAsc(String keyword, Pageable paging);
 }

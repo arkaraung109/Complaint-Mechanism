@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Complaint Details</title>
+    <div th:replace="~{fragments/include :: include}"></div>
+    <script th:src="@{/js/main.js}"></script>
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+<main id="main" class="main">
+    <div class="pagetitle">
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a th:href="@{/}"><i class="fa-solid fa-house"></i><span class="ms-1">Welcome</span></a>
+                </li>
+                <li class="breadcrumb-item"><a th:href="@{/api/complaint/list/all}">Complaint</a></li>
+                <li class="breadcrumb-item"><a
+                        th:href="@{'/api/complaint/list/' + ${#ctx.session.complaintStatus.toLowerCase()}}">[[${#ctx.session.complaintStatus}]]</a>
+                </li>
+                <li class="breadcrumb-item"><a th:href="@{'/api/complaint/details/' + ${complaint.id}}">Details</a></li>
+            </ol>
+        </nav>
+    </div>
+    <section class="section">
+        <div class="card">
+            <div class="card-body">
+                <div class="clearfix mb-4">
+                    <h5 class="card-title float-start">Complaint Details</h5>
+                    <h5 class="mt-4 float-end">Submitted Date: [[${complaint.submittedAt.toLocalDate()}]]</h5>
+                </div>
+                <div class="card shadow p-4">
+                    <h5>Personal Information</h5>
+                    <table class="table mt-2 mb-0">
+                        <tr>
+                            <th style="width: 30%">Name</th>
+                            <td th:text="${complaint.name}"></td>
+                        </tr>
+                        <tr>
+                            <th>Gender</th>
+                            <td th:text="${complaint.gender}"></td>
+                        </tr>
+                        <tr>
+                            <th>Email</th>
+                            <td th:text="${complaint.email}"></td>
+                        </tr>
+                        <tr>
+                            <th>Phone</th>
+                            <td th:text="${complaint.phone}"></td>
+                        </tr>
+                        <tr>
+                            <th>Company</th>
+                            <td th:text="${complaint.company.name}"></td>
+                        </tr>
+                        <tr>
+                            <th>Company Location</th>
+                            <td th:text="${complaint.company.industrialZone.name} + ', ' + ${complaint.company.industrialZone.township.name} + ' Township, ' + ${complaint.company.industrialZone.township.city.name}"></td>
+                        </tr>
+                    </table>
+                    <table class="table mt-0 w-100">
+                        <tr>
+                            <td class="text-center">
+                                <span style="font-size: 15px; font-weight: bold">ID Card Front</span><br>
+                                <img th:src="@{'/api/complaint/display/idCardFront/' + ${complaint.id}}" width="200"
+                                     height="200" alt=""><br>
+                                <button type="button" class="btn btn-success mt-2">Download</button>
+                            </td>
+                            <td class="text-center">
+                                <span style="font-size: 15px; font-weight: bold">ID Card Back</span><br>
+                                <img th:src="@{'/api/complaint/display/idCardBack/' + ${complaint.id}}" width="200"
+                                     height="200" alt=""><br>
+                                <button type="button" class="btn btn-success mt-2">Download</button>
+                            </td>
+                            <td class="text-center">
+                                <span style="font-size: 15px; font-weight: bold">EC Photo 1</span><br>
+                                <img th:src="@{'/api/complaint/display/ecPhoto1/' + ${complaint.id}}" width="200"
+                                     height="200" alt=""><br>
+                                <button type="button" class="btn btn-success mt-2">Download</button>
+                            </td>
+                            <td class="text-center" th:if="${complaint.ecPhoto2 != null}">
+                                <span style="font-size: 15px; font-weight: bold">EC Photo 2</span><br>
+                                <img th:src="@{'/api/complaint/display/ecPhoto2/' + ${complaint.id}}" width="200"
+                                     height="200" alt=""><br>
+                                <button type="button" class="btn btn-success mt-2">Download</button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="card shadow p-4">
+                    <h5>Complaint Information</h5>
+                    <form th:object="${complaintDetails}" th:action="@{/api/complaint/edit}" id="submitForm" method="POST">
+                        <input type="hidden" th:value="*{id}" th:field="*{id}">
+                        <table class="table mt-2 mb-4">
+                            <tr>
+                                <th style="width: 30%; vertical-align: top">Complaint Title</th>
+                                <td>
+                                    <div th:each="complaintTitle : ${complaintTitleList}">
+                                        <input class="form-check-input ms-2 me-2" type="checkbox" name="complaintTitleSet"
+                                               th:value="${complaintTitle.id}"
+                                               th:field="*{complaintTitleSet}"
+                                               th:text="${complaintTitle.name}">
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Description</th>
+                                <td th:text="${complaint.description}"></td>
+                            </tr>
+                            <tr>
+                                <th style="vertical-align: top">Remark</th>
+                                <td>
+                                    <textarea class="form-control" style="height: 150px;" id="remark"
+                                              th:field="*{remark}"></textarea>
+                                    <span class="form-text text-danger" th:if="${#fields.hasErrors('remark')}"
+                                          th:errors="*{remark}"></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Accepted Status</th>
+                                <td>
+                                    <input class="form-radio-input ms-2 me-2" type="radio" name="acceptedStatus"
+                                           th:value="1"
+                                           th:field="*{acceptedStatus}"
+                                           th:text="Accept">
+                                    <input class="form-radio-input ms-2 me-2" type="radio" name="acceptedStatus"
+                                           th:value="0"
+                                           th:field="*{acceptedStatus}"
+                                           th:text="Reject">
+                                    <input class="form-radio-input ms-2 me-2" type="radio" name="acceptedStatus"
+                                           th:value="-1"
+                                           th:field="*{acceptedStatus}"
+                                           th:text="Pending">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Solved Status</th>
+                                <td>
+                                    <input class="form-radio-input ms-2 me-2" type="radio" name="solvedStatus"
+                                           th:value="true"
+                                           th:field="*{solvedStatus}"
+                                           th:text="Solved">
+                                    <input class="form-radio-input ms-2 me-2" type="radio" name="solvedStatus"
+                                           th:value="false"
+                                           th:field="*{solvedStatus}"
+                                           th:text="Unsolved">
+                                </td>
+                            </tr>
+                        </table>
+                        <div class="d-grid gap-2 d-flex justify-content-end">
+                            <button type="submit" class="btn btn-save-changes" style="background:#49b7bf; color:white;">Save Changes</button>
+                            <a th:href="@{'/api/complaint/details/' + ${complaint.id}}" class="btn" style="background:#f56e70; color:white;">Reset</a>
+                            <a th:href="@{'/api/complaint/list/' + ${#ctx.session.complaintTitleName.toLowerCase()} + '?complaintTitleName=' + ${#ctx.session.complaintTitleName} + '&date=' + ${#ctx.session.date} + '&keyword=' + ${#ctx.session.keyword} + '&pageNum=' + ${#ctx.session.pageNum} + '&pageSize=' + ${#ctx.session.pageSize}}" class="btn" style="background:orange; color:white;">Back</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+<script th:inline="javascript">
+    $(document).ready(function() {
+
+    <!-- Make Nav Item Active -->
+        $("#sidebar-nav").children("li:nth-child(3)").children("a").removeClass("collapsed");
+        $("#status-nav").addClass("show");
+
+        var status = [[${#ctx.session.complaintStatus}]];
+        var number;
+        switch(status) {
+            case "All": number = 1; break;
+            case "Trash": number = 2; break;
+            case "Read": number = 4; break;
+            case "Unread": number = 5; break;
+            case "Accepted": number = 7; break;
+            case "Rejected": number = 8; break;
+            case "Pending": number = 9; break;
+            case "Solved": number = 11; break;
+            case "Unsolved": number = 12; break;
+            default: number = 1; break;
+        }
+        $("#status-nav").children("li:nth-child("+ number + ")").children("a").addClass("active");
+    <!-- End -->
+
+    <!-- When save changes button is clicked -->
+        $(".btn-save-changes").click(function(event) {
+            event.preventDefault();
+
+            $.confirm({
+                title: 'Confirm!',
+                content: 'Are you sure to save changes?',
+                type: 'green',
+                autoClose: 'no|10000',
+                buttons: {
+                    yes: {
+                        btnClass: 'btn-success',
+                        action: function () {
+                            $("#submitForm").submit();
+                        }
+                    },
+                    no: function () {}
+                }
+            });
+        });
+    <!-- End -->
+
+    });
+</script>
+</body>
+</html>

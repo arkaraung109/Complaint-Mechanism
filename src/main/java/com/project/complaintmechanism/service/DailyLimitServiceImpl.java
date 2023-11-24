@@ -1,6 +1,7 @@
 package com.project.complaintmechanism.service;
 
 import com.project.complaintmechanism.entity.DailyLimit;
+import com.project.complaintmechanism.model.DailyLimitModel;
 import com.project.complaintmechanism.repository.DailyLimitRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,18 +14,20 @@ public class DailyLimitServiceImpl implements DailyLimitService {
 
     @Override
     public DailyLimit findFirstByOrderById() {
-        if(dailyLimitRepository.findFirstByOrderById() == null) {
-            dailyLimitRepository.save(DailyLimit.builder().maxLimit(15).build());
+        DailyLimit dailyLimit = dailyLimitRepository.findFirstByOrderById();
+        if(dailyLimit == null) {
+            dailyLimit = DailyLimit.builder().maxLimit(15).build();
+            dailyLimitRepository.save(dailyLimit);
         }
-        return dailyLimitRepository.findFirstByOrderById();
+        return dailyLimit;
     }
 
     @Override
-    public void save(int maxLimit) {
+    public void update(DailyLimitModel dailyLimitModel) {
         DailyLimit dailyLimit = DailyLimit.builder()
-                                          .id(1)
-                                          .maxLimit(maxLimit)
-                                          .build();
+                .id(dailyLimitModel.getId())
+                .maxLimit(dailyLimitModel.getMaxLimit())
+                .build();
         dailyLimitRepository.save(dailyLimit);
     }
 

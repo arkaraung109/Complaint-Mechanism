@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Company List</title>
+    <div th:replace="~{fragments/include :: include}"></div>
+    <script th:src="@{/js/main.js}"></script>
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+<main id="main" class="main">
+    <div class="pagetitle">
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a th:href="@{/}"><i class="fa-solid fa-house"></i><span class="ms-1">Welcome</span></a>
+                </li>
+                <li class="breadcrumb-item"><a th:href="@{/api/company/list}">Company</a></li>
+            </ol>
+        </nav>
+    </div>
+    <section class="section">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Company Searching</h5>
+                <form th:action="@{/api/company/list}" id="searchForm">
+                    <div class="row mb-4">
+                        <div class="col-3">
+                            <label for="cityName" class="form-label">Search by city</label>
+                            <select class="form-select" id="cityName" name="cityName">
+                                <option value="" selected>All cities</option>
+                                <option th:each="c : ${cityNameList}" th:text="${c}" th:value="${c}"
+                                        th:selected="${c == cityName}"></option>
+                            </select>
+                        </div>
+                        <div class="col-3">
+                            <label for="townshipName" class="form-label">Search by township</label>
+                            <select class="form-select" id="townshipName" name="townshipName">
+                                <option value="" selected>All townships</option>
+                                <option th:each="t : ${townshipNameList}" th:text="${t}" th:value="${t}"
+                                        th:selected="${t == townshipName}"></option>
+                            </select>
+                        </div>
+                        <div class="col-3">
+                            <label for="industrialZoneName" class="form-label">Search by industrial zone</label>
+                            <select class="form-select" id="industrialZoneName" name="industrialZoneName">
+                                <option value="" selected>All industrial zones</option>
+                                <option th:each="i : ${industrialZoneNameList}" th:text="${i}" th:value="${i}"
+                                        th:selected="${i == industrialZoneName}"></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2 d-flex justify-content-end">
+                        <button type="submit" class="btn" style="background:#49b7bf; color:white;">Search</button>
+                        <button type="button" id="btn-reset" class="btn" style="background:#f56e70; color:white;">
+                            Reset
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="clearfix">
+                    <h5 class="card-title float-start">Company List</h5>
+                    <h5 class="card-title float-end"><a th:href="@{/api/company/add}" class="text-dark"><i
+                            class="fa-solid fa-plus fa-lg me-2"></i>Add new company</a></h5>
+                </div>
+                <div class="clearfix mb-3">
+                    <div class="float-end">
+                        <label for="pageSize" class="form-label mt-1">Entries per page:&nbsp;&nbsp;</label>
+                        <select name="pageSize" th:value="${pageSize}"
+                                class="form-select w-auto float-end" id="pageSize">
+                            <option th:each="s : ${ {5, 10, 15, 20} }" th:value="${s}" th:text="${s}"
+                                    th:selected="${s == pageSize}"></option>
+                        </select>
+                    </div>
+                    <div class="float-start input-group" style="width: 300px">
+                        <input id="keyword" type="text" name="keyword" th:value="${keyword}" class="form-control"
+                               placeholder="&#128269; Filter Search">
+                        <button type="button" id="btn-filter-search" class="btn"
+                                style="background:#49b7bf; color:white;">Search
+                        </button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <caption th:unless="${companyList.isEmpty()}">Showing [[${pageSize * (currentPage - 1) + 1}]] to
+                            [[${pageSize * (currentPage - 1) +
+                            pageSize}]] of Total [[${totalItems}]] Entries
+                        </caption>
+                        <thead>
+                        <tr class="table-dark">
+                            <th>#</th>
+                            <th>Company Name</th>
+                            <th>City Name</th>
+                            <th>Township Name</th>
+                            <th>Industrial Zone Name</th>
+                            <th>Action</th>
+                            <th>Status</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="company, state : ${companyList}">
+                            <td th:text="${company.id}" hidden></td>
+                            <td th:text="${pageSize * (currentPage - 1) + state.index + 1}"></td>
+                            <td th:text="${company.name}"></td>
+                            <td th:text="${company.industrialZone?.township?.city?.name}"></td>
+                            <td th:text="${company.industrialZone?.township?.name}"></td>
+                            <td th:text="${company.industrialZone?.name}"></td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a th:href="@{'/api/company/edit/' + ${company.id}}" class="btn btn-edit">Edit</a>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input status" type="checkbox" role="switch"
+                                           th:checked="${company.activeStatus}">
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <h4 class="card-title text-danger text-center" th:if="${companyList.isEmpty()}">No record found!</h4>
+                <div th:replace="~{fragments/paging :: companyPagination}" th:unless="${companyList.isEmpty()}"></div>
+            </div>
+        </div>
+    </section>
+</main>
+<script th:inline="javascript">
+    $(document).ready(function() {
+
+    <!-- Make Nav Item Active -->
+        $("#sidebar-nav").children("li:nth-child(2)").children("a").removeClass("collapsed");
+        $("#settings-nav").addClass("show");
+        $("#settings-nav").children("li:nth-child(4)").children("a").addClass("active");
+    <!-- End -->
+
+    <!-- Search Boxes in Select Dropdown -->
+        var cityName = document.querySelector("#cityName");
+        var townshipName = document.querySelector("#townshipName");
+        var industrialZoneName = document.querySelector("#industrialZoneName");
+        dselect(cityName, {search: true});
+        dselect(townshipName, {search: true});
+        dselect(industrialZoneName, {search: true});
+    <!-- End -->
+
+    <!-- Alert Boxes -->
+        if([[${updated_success}]]) {
+            iziToast.success({
+                color: 'blue',
+                title: 'Done',
+                message: 'Successfully Updated!',
+                position: 'topCenter'
+            });
+        }
+
+        if([[${deleted_success}]]) {
+            iziToast.success({
+                color: 'red',
+                title: 'Done',
+                message: 'Successfully Deleted!',
+                position: 'topCenter'
+            });
+        }
+
+        if([[${company_not_found}]]) {
+            iziToast.error({
+                color: 'red',
+                title: 'Failed!',
+                message: 'This company is not found!',
+                position: 'topCenter'
+            });
+        }
+
+        if([[${active_status_success}]]) {
+            iziToast.success({
+                message: 'This company is active now!',
+                position: 'topCenter'
+            });
+        }
+
+        if([[${inactive_status_success}]]) {
+            iziToast.warning({
+                message: 'This company is inactive now!',
+                position: 'topCenter'
+            });
+        }
+    <!-- End -->
+
+    <!-- When page size select box is changed -->
+        $("#pageSize").change(function() {
+            var cityName = $("#cityName").val();
+            var townshipName = $("#townshipName").val();
+            var industrialZoneName = $("#industrialZoneName").val();
+            var keyword = $("#keyword").val();
+            var pageSize = $(this).val();
+            window.location = "/api/company/list?cityName=" + cityName + "&townshipName=" + townshipName + "&industrialZoneName=" + industrialZoneName + "&keyword=" + keyword + "&pageSize=" + pageSize;
+        });
+    <!-- End -->
+
+    <!-- When search button from filter search box is clicked -->
+        $("#btn-filter-search").on("click", function() {
+            var cityName = $("#cityName").val();
+            var townshipName = $("#townshipName").val();
+            var industrialZoneName = $("#industrialZoneName").val();
+            var keyword = $("#keyword").val();
+            var pageSize = $("#pageSize option:selected").val();
+            window.location = "/api/company/list?cityName=" + cityName + "&townshipName=" + townshipName + "&industrialZoneName=" + industrialZoneName + "&keyword=" + keyword + "&pageSize=" + pageSize;
+        });
+    <!-- End -->
+
+    <!-- When status button is clicked -->
+        $(document).delegate(".status", "change", function() {
+            var parent = $(this).parent().parent().parent();
+            var id = parent.children("td:nth-child(1)").html();
+
+            if($(this).is(':checked')) {
+                window.location = "/api/company/status/1/" + id;
+            }
+            else {
+                window.location = "/api/company/status/0/" + id;
+            }
+        });
+    <!-- End -->
+
+    <!-- When reset button is clicked -->
+        $("#btn-reset").on("click", function() {
+            var pageSize = $("#pageSize").val();
+            pageSize = pageSize == undefined ? 5 : pageSize;
+            window.location = "/api/company/list?pageSize=" + pageSize;
+        });
+    <!-- End -->
+
+    });
+</script>
+</body>
+</html>

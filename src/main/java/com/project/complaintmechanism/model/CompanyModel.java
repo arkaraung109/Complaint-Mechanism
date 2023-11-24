@@ -3,11 +3,13 @@ package com.project.complaintmechanism.model;
 import com.project.complaintmechanism.customValidator.UniqueCompany;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
 import lombok.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @UniqueCompany(message = "Company already exists")
 public class CompanyModel {
 
@@ -17,13 +19,15 @@ public class CompanyModel {
     @Pattern(regexp = "^([^<>~`!\\[\\]{}|@#^*+=:;/?%$\"\\\\]){0,100}$", message = "Please enter excluding special characters")
     private String name;
 
-    @NotBlank(message = "Please choose city name")
-    private String cityName;
+    private boolean activeStatus;
 
-    @NotBlank(message = "Please choose township name")
-    private String townshipName;
+    @Positive(message = "Please choose city")
+    private long cityId;
 
-    @NotBlank(message = "Please choose industrial zone name")
-    private String industrialZoneName;
+    @Positive(message = "Please choose township")
+    private long townshipId;
+
+    @Positive(message = "Please choose industrial zone")
+    private long industrialZoneId;
 
 }

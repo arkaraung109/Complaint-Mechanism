@@ -1,256 +1,276 @@
 package com.project.complaintmechanism.controller;
 
-import com.project.complaintmechanism.entity.ComplaintForm;
-import com.project.complaintmechanism.entity.ComplaintTitle;
+import com.project.complaintmechanism.entity.*;
+import com.project.complaintmechanism.model.ComplaintDetailsModel;
 import com.project.complaintmechanism.model.ComplaintModel;
 import com.project.complaintmechanism.model.DailyLimitModel;
-import com.project.complaintmechanism.service.CompanyService;
-import com.project.complaintmechanism.service.ComplaintFormService;
-import com.project.complaintmechanism.service.ComplaintTitleService;
-import com.project.complaintmechanism.service.DailyLimitService;
+import com.project.complaintmechanism.service.*;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.Objects;
 
 @Controller
+@ControllerAdvice
 @RequestMapping("/api/complaint")
 public class ComplaintController {
 
     @Autowired
-    CompanyService companyService;
+    private CityService cityService;
     @Autowired
-    ComplaintTitleService complaintTitleService;
+    private TownshipService townshipService;
     @Autowired
-    ComplaintFormService complaintFormService;
+    private IndustrialZoneService industrialZoneService;
     @Autowired
-    DailyLimitService dailyLimitService;
+    private CompanyService companyService;
+    @Autowired
+    private ComplaintTitleService complaintTitleService;
+    @Autowired
+    private ComplaintService complaintService;
+    @Autowired
+    private DailyLimitService dailyLimitService;
 
-    @GetMapping("/all")
-    public String showAllList(Model model, HttpSession httpSession) {
-
-        httpSession.setAttribute("status", "All");
-        return showList(model, httpSession);
-
-    }
-
-    @GetMapping("/trash")
-    public String showTrashList(Model model, HttpSession httpSession) {
-
-        httpSession.setAttribute("status", "Trash");
-        return showList(model, httpSession);
-
-    }
-
-    @GetMapping("/read")
-    public String showReadList(Model model, HttpSession httpSession) {
-
-        httpSession.setAttribute("status", "Read");
-        return showList(model, httpSession);
-
-    }
-
-    @GetMapping("/unread")
-    public String showUnreadList(Model model, HttpSession httpSession) {
-
-        httpSession.setAttribute("status", "Unread");
-        return showList(model, httpSession);
-
-    }
-
-    @GetMapping("/accepted")
-    public String showAcceptedList(Model model, HttpSession httpSession) {
-
-        httpSession.setAttribute("status", "Accepted");
-        return showList(model, httpSession);
-
-    }
-
-    @GetMapping("/rejected")
-    public String showRejectedList(Model model, HttpSession httpSession) {
-
-        httpSession.setAttribute("status", "Rejected");
-        return showList(model, httpSession);
-
-    }
-
-    @GetMapping("/pending")
-    public String showPendingList(Model model, HttpSession httpSession) {
-
-        httpSession.setAttribute("status", "Pending");
-        return showList(model, httpSession);
-
-    }
-
-    @GetMapping("/solved")
-    public String showSolvedList(Model model, HttpSession httpSession) {
-
-        httpSession.setAttribute("status", "Solved");
-        return showList(model, httpSession);
-
-    }
-
-    @GetMapping("/unsolved")
-    public String showUnsolvedList(Model model, HttpSession httpSession) {
-
-        httpSession.setAttribute("status", "Unsolved");
-        return showList(model, httpSession);
-
-    }
-
-    public String showList(Model model, HttpSession httpSession) {
-
-        model.addAttribute("dailyLimit", new DailyLimitModel());
-        return getByPage(model, httpSession, null, null, null, 1, 5);
-
-    }
-
-    @GetMapping("/page")
-    public String getPaginated(Model model, HttpSession httpSession, @RequestParam(required = false) String companyName, @RequestParam(required = false) String complaintTitleName, @RequestParam(required = false) String date, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "5") int size) {
-
-        model.addAttribute("dailyLimit", new DailyLimitModel());
-        return getByPage(model, httpSession, companyName, complaintTitleName, date, page, size);
-
-    }
-
-    public String getByPage(Model model, HttpSession httpSession, String companyName, String complaintTitleName, String date, int page, int size) {
-
-        Pageable paging = PageRequest.of(page - 1, size);
-        Page<ComplaintForm> complaintPage = null;
-        boolean isEmptyCompanyName = (companyName == null || companyName.equalsIgnoreCase(""));
-        boolean isEmptyComplaintTitleName = (complaintTitleName == null || complaintTitleName.equalsIgnoreCase(""));
-        boolean isEmptyDate = (date == null || date.equalsIgnoreCase(""));
-        String status = (String) httpSession.getAttribute("status");
-
-        if(isEmptyCompanyName && isEmptyComplaintTitleName && isEmptyDate) {
-            complaintPage = complaintFormService.findByPage(status, paging);
-        }
-        else if(!isEmptyCompanyName && isEmptyComplaintTitleName && isEmptyDate) {
-            complaintPage = complaintFormService.findByPageWithCompanyName(status, companyName, paging);
-            model.addAttribute("companyName", companyName);
-        }
-        else if(isEmptyCompanyName && !isEmptyComplaintTitleName && isEmptyDate) {
-            complaintPage = complaintFormService.findByPageWithComplaintTitleName(status, complaintTitleName, paging);
-            model.addAttribute("complaintTitleName", complaintTitleName);
-        }
-        else if(isEmptyCompanyName && isEmptyComplaintTitleName && !isEmptyDate) {
-            complaintPage = complaintFormService.findByPageWithDate(status, date, paging);
-            model.addAttribute("date", date);
-        }
-        else if(!isEmptyCompanyName && !isEmptyComplaintTitleName && isEmptyDate) {
-            complaintPage = complaintFormService.findByPageWithCompanyNameAndComplaintTitleName(status, companyName, complaintTitleName, paging);
-            model.addAttribute("companyName", companyName);
-            model.addAttribute("complaintTitleName", complaintTitleName);
-        }
-        else if(!isEmptyCompanyName && isEmptyComplaintTitleName && !isEmptyDate) {
-            complaintPage = complaintFormService.findByPageWithCompanyNameAndDate(status, companyName, date, paging);
-            model.addAttribute("companyName", companyName);
-            model.addAttribute("date", date);
-        }
-        else if(isEmptyCompanyName && !isEmptyComplaintTitleName && !isEmptyDate) {
-            complaintPage = complaintFormService.findByPageWithComplaintTitleNameAndDate(status, complaintTitleName, date, paging);
-            model.addAttribute("complaintTitleName", complaintTitleName);
-            model.addAttribute("date", date);
-        }
-        else {
-            complaintPage = complaintFormService.findByPageWithCompanyNameAndComplaintTitleNameAndDate(status, companyName, complaintTitleName, date, paging);
-            model.addAttribute("companyName", companyName);
-            model.addAttribute("complaintTitleName", complaintTitleName);
-            model.addAttribute("date", date);
+    @GetMapping("/list/{status}")
+    public String navigateToListPage(@PathVariable("status") String status, @RequestParam(defaultValue = "") String complaintTitleName, @RequestParam(defaultValue = "") String date, @RequestParam(defaultValue = "") String keyword, @RequestParam(defaultValue = "1") int pageNum, @RequestParam(defaultValue = "5") int pageSize, Model model, HttpSession httpSession) {
+        if(Objects.equals(status, "all")) {
+            httpSession.setAttribute("complaintStatus", "All");
+        } else if(Objects.equals(status, "trash")) {
+            httpSession.setAttribute("complaintStatus", "Trash");
+        } else if(Objects.equals(status, "read")) {
+            httpSession.setAttribute("complaintStatus", "Read");
+        } else if(Objects.equals(status, "unread")) {
+            httpSession.setAttribute("complaintStatus", "Unread");
+        } else if(Objects.equals(status, "accepted")) {
+            httpSession.setAttribute("complaintStatus", "Accepted");
+        } else if(Objects.equals(status, "rejected")) {
+            httpSession.setAttribute("complaintStatus", "Rejected");
+        } else if(Objects.equals(status, "pending")) {
+            httpSession.setAttribute("complaintStatus", "Pending");
+        } else if(Objects.equals(status, "solved")) {
+            httpSession.setAttribute("complaintStatus", "Solved");
+        } else if(Objects.equals(status, "unsolved")) {
+            httpSession.setAttribute("complaintStatus", "Unsolved");
+        } else {
+            return "redirect:/api/complaint/list/all";
         }
 
-        List<ComplaintForm> complaintFormList = complaintPage.getContent();
-        List<ComplaintModel> complaintList = new ArrayList<>();
+        httpSession.setAttribute("complaintTitleName", complaintTitleName);
+        httpSession.setAttribute("date", date);
+        httpSession.setAttribute("keyword", keyword);
+        httpSession.setAttribute("pageNum", pageNum);
+        httpSession.setAttribute("pageSize", pageSize);
 
-        for(ComplaintForm complaintForm : complaintFormList) {
-            String description = complaintForm.getDescription();
-            LocalDateTime submitted_at = complaintForm.getSubmittedAt();
-            LocalDate submitted_date = submitted_at.toLocalDate();
-            Set<ComplaintTitle> complaintTitleSet = complaintForm.getComplaintTitleSet();
-            List<String> complaintTitleList = new ArrayList<>();
-            for(ComplaintTitle ct : complaintTitleSet) {
-                complaintTitleList.add(ct.getName());
-            }
+        boolean tempDeletedStatus = Objects.equals(status, "all") || Objects.equals(status, "trash");
+        boolean readStatus = Objects.equals(status, "read") || Objects.equals(status, "unread");
+        boolean acceptedStatus = Objects.equals(status, "accepted") || Objects.equals(status, "rejected") || Objects.equals(status, "pending");
+        boolean solvedStatus = Objects.equals(status, "solved") || Objects.equals(status, "unsolved");
 
-            ComplaintModel complaintModel = ComplaintModel.builder()
-                                                          .id(complaintForm.getId())
-                                                          .description(description)
-                                                          .date(submitted_date)
-                                                          .readStatus(complaintForm.isReadStatus() ? "Read" : "Unread")
-                                                          .acceptedStatus(complaintForm.getAcceptedStatus() == -1 ? "Pending" : complaintForm.getAcceptedStatus() == 0 ? "Rejected" : "Accepted")
-                                                          .solvedStatus(complaintForm.isSolvedStatus() ? "Solved" : "Unsolved")
-                                                          .tempDeletedStatus(complaintForm.isTempDeletedStatus())
-                                                          .name(complaintForm.getName())
-                                                          .companyName(complaintForm.getCompany().getName())
-                                                          .complaintTitle(String.join(", ", complaintTitleList))
-                                                          .build();
-            complaintList.add(complaintModel);
+        DailyLimit dailyLimit = dailyLimitService.findFirstByOrderById();
+        DailyLimitModel dailyLimitModel = DailyLimitModel.builder()
+                .id(dailyLimit.getId())
+                .maxLimit(dailyLimit.getMaxLimit())
+                .build();
+
+        Page<Complaint> complaintPage = null;
+        if(tempDeletedStatus) {
+            complaintPage = complaintService.findByPageForTempDeletedStatus(status, complaintTitleName, date, keyword, pageNum, pageSize);
+        } else if(readStatus) {
+            complaintPage = complaintService.findByPageForReadStatus(status, complaintTitleName, date, keyword, pageNum, pageSize);
+        } else if(acceptedStatus) {
+            complaintPage = complaintService.findByPageForAcceptedStatus(status, complaintTitleName, date, keyword, pageNum, pageSize);
+        } else if(solvedStatus) {
+            complaintPage = complaintService.findByPageForSolvedStatus(status, complaintTitleName, date, keyword, pageNum, pageSize);
         }
 
-
-        List<String> companyNameList = companyService.findAllNames();
+        List<Complaint> complaintList = complaintPage != null ? complaintPage.getContent() : new ArrayList<>();
+        int currentPage = (complaintPage != null ? complaintPage.getNumber() : 0) + 1;
+        long totalItems = complaintPage != null ? complaintPage.getTotalElements() : 0;
+        int totalPages = complaintPage != null ? complaintPage.getTotalPages() : 0;
         List<String> complaintTitleNameList = complaintTitleService.findAllNames();
-        int maxLimit = dailyLimitService.findFirstByOrderById().getMaxLimit();
-        model.addAttribute("companyNameList", companyNameList);
+
         model.addAttribute("complaintTitleNameList", complaintTitleNameList);
         model.addAttribute("complaintList", complaintList);
-        model.addAttribute("currentPage", complaintPage.getNumber() + 1);
-        model.addAttribute("totalItems", complaintPage.getTotalElements());
-        model.addAttribute("totalPages", complaintPage.getTotalPages());
-        model.addAttribute("pageSize", size);
-        model.addAttribute("limit", maxLimit);
-        model.addAttribute("complaintCount", complaintFormService.findComplaintFormCountToday());
-        return "complaint_list";
-
+        model.addAttribute("dailyLimit", dailyLimitModel);
+        model.addAttribute("complaintCount", complaintService.findComplaintCountToday());
+        model.addAttribute("complaintTitleName", complaintTitleName);
+        model.addAttribute("date", date);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("currentPage", currentPage);
+        model.addAttribute("totalItems", totalItems);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("pageSize", pageSize);
+        return "complaint/complaint_list";
     }
 
-    @PostMapping("/dailyLimit/update")
-    public String update(@Valid @ModelAttribute("dailyLimit") DailyLimitModel dailyLimitModel, HttpSession httpSession, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
+    @GetMapping("/add")
+    public String navigateToAddPage(Model model, RedirectAttributes redirectAttributes) {
+        int dailyLimit = dailyLimitService.findFirstByOrderById().getMaxLimit();
+        boolean exceed = complaintService.checkLimitExceeded(dailyLimit);
+
+        if(exceed) {
+            redirectAttributes.addFlashAttribute("exceeded", true);
+            return "redirect:/api/complaint/message";
+        }
+
+        List<City> cityList = cityService.findAll();
+        List<ComplaintTitle> complaintTitleList = complaintTitleService.findAll();
+        model.addAttribute("cityList", cityList);
+        model.addAttribute("complaintTitleList", complaintTitleList);
+        model.addAttribute("complaint", new ComplaintModel());
+        return "complaint/complaint_add";
+    }
+
+    @PostMapping("/add")
+    public String add(@Valid @ModelAttribute("complaint") ComplaintModel complaintModel, BindingResult result, Model model, RedirectAttributes redirectAttributes) throws IOException {
+        if (!result.hasErrors()) {
+            int dailyLimit = dailyLimitService.findFirstByOrderById().getMaxLimit();
+            boolean exceed = complaintService.checkLimitExceeded(dailyLimit);
+
+            if(!exceed) {
+                complaintService.save(complaintModel);
+                redirectAttributes.addFlashAttribute("added_success", true);
+            }
+            else {
+                redirectAttributes.addFlashAttribute("exceeded", true);
+            }
+            return "redirect:/api/complaint/message";
+        }
+
+        List<City> cityList = cityService.findAll();
+        List<Township> townshipList = townshipService.findByCityId(complaintModel.getCityId());
+        List<IndustrialZone> industrialZoneList = industrialZoneService.findByTownshipId(complaintModel.getTownshipId());
+        List<Company> companyList = companyService.findByIndustrialZoneId(complaintModel.getIndustrialZoneId());
+        List<ComplaintTitle> complaintTitleList = complaintTitleService.findAll();
+        model.addAttribute("cityList", cityList);
+        model.addAttribute("townshipList", townshipList);
+        model.addAttribute("industrialZoneList", industrialZoneList);
+        model.addAttribute("companyList", companyList);
+        model.addAttribute("complaintTitleList", complaintTitleList);
+        model.addAttribute("complaint", complaintModel);
+        return "complaint/complaint_add";
+    }
+
+    @PostMapping("/edit")
+    public String update(@Valid @ModelAttribute("complaintDetails") ComplaintDetailsModel complaintDetailsModel, BindingResult result, Model model, RedirectAttributes redirectAttributes, HttpSession httpSession) throws IOException {
+        if(httpSession.getAttribute("complaintStatus") == null) {
+            httpSession.setAttribute("complaintStatus", "All");
+        }
+
+        String complaintStatus = (String) httpSession.getAttribute("complaintStatus");
+        String complaintTitleName = (String) httpSession.getAttribute("complaintTitleName");
+        String date = (String) httpSession.getAttribute("date");
+        String keyword = (String) httpSession.getAttribute("keyword");
+        int pageNum = (Integer) httpSession.getAttribute("pageNum");
+        int pageSize = (Integer) httpSession.getAttribute("pageSize");
 
         if (!result.hasErrors()) {
-            dailyLimitService.save(dailyLimitModel.getMaxLimit());
-            redirectAttributes.addFlashAttribute("updated_success", true);
-            return "redirect:/api/complaint/";
-        }
-        return getByPage(model,httpSession, null, null, null, 1, 5);
+            complaintService.update(complaintDetailsModel);
+            redirectAttributes.addFlashAttribute("saved_changes_success", true);
 
+            return "redirect:/api/complaint/list/" + complaintStatus.toLowerCase() + "?complaintTitleName=" + complaintTitleName + "&date=" + date + "&keyword=" + keyword + "&pageNum=" + pageNum + "&pageSize=" + pageSize;
+        }
+
+        Complaint complaint = complaintService.findById(complaintDetailsModel.getId());
+        if(!Objects.isNull(complaint)) {
+            List<ComplaintTitle> complaintTitleList = complaintTitleService.findAll();
+            model.addAttribute("complaintTitleList", complaintTitleList);
+            model.addAttribute("complaint", complaint);
+            model.addAttribute("complaintDetails", complaintDetailsModel);
+            return "complaint/complaint_details";
+        } else {
+            redirectAttributes.addFlashAttribute("complaint_not_found", true);
+            return "redirect:/api/complaint/list/" + complaintStatus.toLowerCase() + "?complaintTitleName=" + complaintTitleName + "&date=" + date + "&keyword=" + keyword + "&pageNum=" + pageNum + "&pageSize=" + pageSize;
+        }
+    }
+
+    @GetMapping("/message")
+    public String navigateToMessagePage() {
+        return "message";
     }
 
     @PostMapping("/changeReadStatus")
     @ResponseBody
-    public void changeReadStatus(@RequestParam("id") int id, @RequestParam("status") boolean status) {
-
-        complaintFormService.changeReadStatus(id, status);
-
+    public void changeReadStatus(@RequestParam("idList[]") long[] idList, @RequestParam("status") boolean status) {
+        for(long id : idList) {
+            complaintService.changeReadStatus(id, status);
+        }
     }
 
     @PostMapping("/changeTempDeletedStatus")
     @ResponseBody
-    public void changeTempDeletedStatus(@RequestParam("id") int id, @RequestParam("status") boolean status) {
-
-        complaintFormService.changeTempDeletedStatus(id, status);
-
+    public void changeTempDeletedStatus(@RequestParam("idList[]") long[] idList, @RequestParam("status") boolean status) {
+        for(long id: idList) {
+            complaintService.changeTempDeletedStatus(id, status);
+        }
     }
 
     @PostMapping("/emptyTrash")
     @ResponseBody
     public void emptyTrash() {
+        complaintService.emptyTrash();
+    }
 
-        complaintFormService.emptyTrash();
+    @GetMapping("/details/{id}")
+    public String navigateToDetailPage(@PathVariable("id") long id, Model model, RedirectAttributes redirectAttributes, HttpSession httpSession) {
+        if(httpSession.getAttribute("complaintStatus") == null) {
+            httpSession.setAttribute("complaintStatus", "All");
+        }
 
+        Complaint complaint = complaintService.findById(id);
+        if(!Objects.isNull(complaint)) {
+            ComplaintDetailsModel complaintDetailsModel = ComplaintDetailsModel.builder()
+                    .id(complaint.getId())
+                    .remark(complaint.getRemark())
+                    .acceptedStatus(complaint.getAcceptedStatus())
+                    .solvedStatus(complaint.isSolvedStatus())
+                    .complaintTitleSet(complaint.getComplaintTitleSet())
+                    .build();
+            List<ComplaintTitle> complaintTitleList = complaintTitleService.findAll();
+            model.addAttribute("complaintTitleList", complaintTitleList);
+            model.addAttribute("complaint", complaint);
+            model.addAttribute("complaintDetails", complaintDetailsModel);
+            return "complaint/complaint_details";
+        } else {
+            redirectAttributes.addFlashAttribute("complaint_not_found", true);
+
+            String complaintStatus = (String) httpSession.getAttribute("complaintStatus");
+            String complaintTitleName = (String) httpSession.getAttribute("complaintTitleName");
+            String date = (String) httpSession.getAttribute("date");
+            String keyword = (String) httpSession.getAttribute("keyword");
+            int pageNum = (Integer) httpSession.getAttribute("pageNum");
+            int pageSize = (Integer) httpSession.getAttribute("pageSize");
+            return "redirect:/api/complaint/list/" + complaintStatus.toLowerCase() + "?complaintTitleName=" + complaintTitleName + "&date=" + date + "&keyword=" + keyword + "&pageNum=" + pageNum + "&pageSize=" + pageSize;
+        }
+    }
+
+    @RequestMapping("/display/{image}/{id}")
+    public void displayIdCardFront(@PathVariable("image") String image, @PathVariable("id")int id, HttpServletResponse response) throws IOException {
+        Complaint complaint = complaintService.findById(id);
+        response.setContentType("image/jpeg");
+        byte[] bytes = switch (image) {
+            case "idCardFront" -> complaint.getIdCardFront();
+            case "idCardBack" -> complaint.getIdCardBack();
+            case "ecPhoto1" -> complaint.getEcPhoto1();
+            case "ecPhoto2" -> complaint.getEcPhoto2();
+            default -> new byte[0];
+        };
+
+        InputStream inputStream = new ByteArrayInputStream(bytes);
+        IOUtils.copy(inputStream, response.getOutputStream());
     }
 
 }

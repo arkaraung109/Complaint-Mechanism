@@ -33,7 +33,7 @@
                                 <hr class="dropdown-divider">
                             </li>
                             <li>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
+                                <a class="dropdown-item d-flex align-items-center" th:href="@{/logout}">
                                     <i class="fa-solid fa-arrow-right"></i>
                                     <span class="ms-2">Sign Out</span>
                                 </a>
@@ -58,11 +58,11 @@
                         <i class="bi bi-chevron-down ms-auto"></i>
                     </a>
                     <ul id="settings-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
-                        <li><a th:href="@{/api/city/}"><i class="bi bi-circle mt-1"></i><span>City</span></a></li>
-                        <li><a th:href="@{/api/township/}"><i class="bi bi-circle mt-1"></i><span>Township</span></a></li>
-                        <li><a th:href="@{/api/industrialZone/}"><i class="bi bi-circle mt-1"></i><span>Industrial Zone</span></a></li>
-                        <li><a th:href="@{/api/company/}"><i class="bi bi-circle mt-1"></i><span>Company</span></a></li>
-                        <li><a th:href="@{/api/complaintTitle/}"><i class="bi bi-circle mt-1"></i><span>Complaint Title</span></a></li>
+                        <li><a th:href="@{/api/city/list}"><i class="bi bi-circle mt-1"></i><span>City</span></a></li>
+                        <li><a th:href="@{/api/township/list}"><i class="bi bi-circle mt-1"></i><span>Township</span></a></li>
+                        <li><a th:href="@{/api/industrialZone/list}"><i class="bi bi-circle mt-1"></i><span>Industrial Zone</span></a></li>
+                        <li><a th:href="@{/api/company/list}"><i class="bi bi-circle mt-1"></i><span>Company</span></a></li>
+                        <li><a th:href="@{/api/complaintTitle/list}"><i class="bi bi-circle mt-1"></i><span>Complaint Title</span></a></li>
                     </ul>
                 </li>
                 <li class="nav-item">
@@ -72,18 +72,18 @@
                         <i class="bi bi-chevron-down ms-auto"></i>
                     </a>
                     <ul id="status-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
-                        <li><a th:href="@{/api/complaint/all}"><i class="bi bi-circle"></i><span>All</span></a></li>
-                        <li><a th:href="@{/api/complaint/trash}"><i class="bi bi-circle"></i><span>Trash</span></a></li>
+                        <li><a th:href="@{/api/complaint/list/all}"><i class="bi bi-circle"></i><span>All</span></a></li>
+                        <li><a th:href="@{/api/complaint/list/trash}"><i class="bi bi-circle"></i><span>Trash</span></a></li>
                         <li><hr class="m-0"></li>
-                        <li><a th:href="@{/api/complaint/read}"><i class="bi bi-circle"></i><span>Read</span></a></li>
-                        <li><a th:href="@{/api/complaint/unread}"><i class="bi bi-circle"></i><span>Unread</span></a></li>
+                        <li><a th:href="@{/api/complaint/list/read}"><i class="bi bi-circle"></i><span>Read</span></a></li>
+                        <li><a th:href="@{/api/complaint/list/unread}"><i class="bi bi-circle"></i><span>Unread</span></a></li>
                         <li><hr class="m-0"></li>
-                        <li><a th:href="@{/api/complaint/accepted}"><i class="bi bi-circle"></i><span>Accepted</span></a></li>
-                        <li><a th:href="@{/api/complaint/rejected}"><i class="bi bi-circle"></i><span>Rejected</span></a></li>
-                        <li><a th:href="@{/api/complaint/pending}"><i class="bi bi-circle"></i><span>Pending</span></a></li>
+                        <li><a th:href="@{/api/complaint/list/accepted}"><i class="bi bi-circle"></i><span>Accepted</span></a></li>
+                        <li><a th:href="@{/api/complaint/list/rejected}"><i class="bi bi-circle"></i><span>Rejected</span></a></li>
+                        <li><a th:href="@{/api/complaint/list/pending}"><i class="bi bi-circle"></i><span>Pending</span></a></li>
                         <li><hr class="m-0"></li>
-                        <li><a th:href="@{/api/complaint/solved}"><i class="bi bi-circle"></i><span>Solved</span></a></li>
-                        <li><a th:href="@{/api/complaint/unsolved}"><i class="bi bi-circle"></i><span>Unsolved</span></a></li>
+                        <li><a th:href="@{/api/complaint/list/solved}"><i class="bi bi-circle"></i><span>Solved</span></a></li>
+                        <li><a th:href="@{/api/complaint/list/unsolved}"><i class="bi bi-circle"></i><span>Unsolved</span></a></li>
                     </ul>
                 </li>
             </ul>

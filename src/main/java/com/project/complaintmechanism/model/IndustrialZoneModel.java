@@ -3,11 +3,13 @@ package com.project.complaintmechanism.model;
 import com.project.complaintmechanism.customValidator.UniqueIndustrialZone;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
 import lombok.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @UniqueIndustrialZone(message = "Industrial zone already exists")
 public class IndustrialZoneModel {
 
@@ -17,10 +19,10 @@ public class IndustrialZoneModel {
     @Pattern(regexp = "^([^<>~`!\\[\\]{}|@#^*+=:;/?%$\"\\\\]){0,100}$", message = "Please enter excluding special characters")
     private String name;
 
-    @NotBlank(message = "Please choose city name")
-    private String cityName;
+    @Positive(message = "Please choose city")
+    private long cityId;
 
-    @NotBlank(message = "Please choose township name")
-    private String townshipName;
+    @Positive(message = "Please choose township")
+    private long townshipId;
 
 }

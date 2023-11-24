@@ -11,18 +11,18 @@ import org.springframework.stereotype.Component;
 public class UniqueIndustrialZoneValidator implements ConstraintValidator<UniqueIndustrialZone, IndustrialZoneModel> {
 
     @Autowired
-    IndustrialZoneService industrialZoneService;
+    private IndustrialZoneService industrialZoneService;
 
     @Override
     public boolean isValid(IndustrialZoneModel industrialZoneModel, ConstraintValidatorContext constraintValidatorContext) {
-        String cityName = industrialZoneModel.getCityName();
-        String townshipName = industrialZoneModel.getTownshipName();
+        long cityId = industrialZoneModel.getCityId();
+        long townshipId = industrialZoneModel.getTownshipId();
         String industrialZoneName = industrialZoneModel.getName();
         constraintValidatorContext.disableDefaultConstraintViolation();
         constraintValidatorContext.buildConstraintViolationWithTemplate(constraintValidatorContext.getDefaultConstraintMessageTemplate())
                                   .addPropertyNode( "name" )
                                   .addConstraintViolation();
-        return !industrialZoneService.findExistsByCityNameAndTownshipName(cityName, townshipName, industrialZoneName);
+        return !industrialZoneService.findExistsByCityIdAndTownshipIdAndIndustrialZoneName(cityId, townshipId, industrialZoneName);
     }
 
 }

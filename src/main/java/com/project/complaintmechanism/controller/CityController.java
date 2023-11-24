@@ -4,12 +4,10 @@ import com.project.complaintmechanism.entity.City;
 import com.project.complaintmechanism.entity.Township;
 import com.project.complaintmechanism.model.CityModel;
 import com.project.complaintmechanism.service.CityService;
-import com.project.complaintmechanism.service.TownshipService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,111 +15,95 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 
 @Controller
 @RequestMapping("/api/city")
 public class CityController {
 
     @Autowired
-    CityService cityService;
-    @Autowired
-    TownshipService townshipService;
+    private CityService cityService;
 
-    @GetMapping("/")
-    public String showList(Model model) {
-
-        model.addAttribute("city", new CityModel());
-        return getByPage(model, null, 1, 5);
-
-    }
-
-    @GetMapping("/page")
-    public String getPaginated(Model model, @RequestParam(required = false) String keyword, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "5") int size) {
-
-        model.addAttribute("city", new CityModel());
-        return getByPage(model, keyword, page, size);
-
-    }
-
-    public String getByPage(Model model, String keyword, int page, int size) {
-
-        Pageable paging = PageRequest.of(page - 1, size);
-        Page<City> cityPage;
-
-        if(keyword == null || keyword.equalsIgnoreCase("")) {
-            cityPage = cityService.findByPage(paging);
-        }
-        else {
-            cityPage = cityService.findByPageWithCityName(keyword, paging);
-            model.addAttribute("keyword", keyword);
-        }
-
+    @GetMapping("/list")
+    public String navigateToListPage(Model model, @RequestParam(defaultValue = "") String keyword, @RequestParam(defaultValue = "1") int pageNum, @RequestParam(defaultValue = "5") int pageSize, HttpSession httpSession) {
+        Page<City> cityPage = cityService.findByPage(keyword, pageNum, pageSize);
         List<City> cityList = cityPage.getContent();
+
+        httpSession.setAttribute("keyword", keyword);
+        httpSession.setAttribute("pageNum", pageNum);
+        httpSession.setAttribute("pageSize", pageSize);
+
         model.addAttribute("cityList", cityList);
+        model.addAttribute("keyword", keyword);
         model.addAttribute("currentPage", cityPage.getNumber() + 1);
         model.addAttribute("totalItems", cityPage.getTotalElements());
         model.addAttribute("totalPages", cityPage.getTotalPages());
-        model.addAttribute("pageSize", size);
-        return "city_list";
+        model.addAttribute("pageSize", pageSize);
+        return "city/city_list";
+    }
 
+    @GetMapping("/add")
+    public String navigateToAddPage(Model model) {
+        model.addAttribute("city", new CityModel());
+        return "city/city_add";
     }
 
     @PostMapping("/add")
     public String add(@Valid @ModelAttribute("city") CityModel cityModel, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
-
         if (!result.hasErrors()) {
-            cityService.saveOrUpdate(cityModel);
+            cityService.save(cityModel);
             redirectAttributes.addFlashAttribute("added_success", true);
-            return "redirect:/api/city/";
+            return "redirect:/api/city/add";
         }
-        return getByPage(model, null, 1, 5);
-
+        model.addAttribute("city", cityModel);
+        return "city/city_add";
     }
 
-    @PostMapping("/update/{id}")
-    public String update(@PathVariable("id") long id, @Valid @ModelAttribute("city") CityModel cityModel, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
+    @GetMapping("/edit/{id}")
+    public String navigateToEditPage(@PathVariable("id") long id, Model model, RedirectAttributes redirectAttributes) {
+        City city = cityService.findById(id);
 
-        Optional<City> city = cityService.findById(id);
-
-        if(city.isPresent()) {
-            if(!result.hasErrors())  {
-                cityModel.setId(id);
-                cityService.saveOrUpdate(cityModel);
-                redirectAttributes.addFlashAttribute("updated_success", true);
-                return "redirect:/api/city/";
-            }
-
-            return getByPage(model, null, 1, 5);
-        }
-        else {
+        if (!Objects.isNull(city)) {
+            CityModel cityModel = CityModel.builder()
+                    .id(city.getId())
+                    .name(city.getName())
+                    .build();
+            model.addAttribute("city", cityModel);
+            return "city/city_edit";
+        } else {
             redirectAttributes.addFlashAttribute("city_not_found", true);
-            return "redirect:/api/city/";
+            return "redirect:/api/city/list";
+        }
+    }
+
+    @PostMapping("/edit")
+    public String update(@Valid @ModelAttribute("city") CityModel cityModel, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
+        if (!result.hasErrors()) {
+            cityService.update(cityModel);
+            redirectAttributes.addFlashAttribute("updated_success", true);
+            return "redirect:/api/city/list";
         }
 
+        model.addAttribute("city", cityModel);
+        return "city/city_edit";
     }
 
     @GetMapping("/delete/{id}")
-    public String delete(@PathVariable("id") long id, Model model, RedirectAttributes redirectAttributes) {
+    public String delete(@PathVariable("id") long id, RedirectAttributes redirectAttributes) {
+        City city = cityService.findById(id);
 
-        Optional<City> city = cityService.findById(id);
-
-        if(city.isPresent()) {
-            List<Township> townshipList = city.get().getTownshipList();
-
-            if(!townshipList.isEmpty()) {
-                townshipService.deleteCityByCityId(id);
+        if (!Objects.isNull(city)) {
+            List<Township> townshipList = city.getTownshipList();
+            if (townshipList.isEmpty()) {
+                cityService.deleteById(id);
+                redirectAttributes.addFlashAttribute("deleted_success", true);
+            } else {
+                redirectAttributes.addFlashAttribute("found_township", true);
             }
-
-            cityService.deleteById(id);
-            redirectAttributes.addFlashAttribute("deleted_success", true);
-        }
-        else {
+        } else {
             redirectAttributes.addFlashAttribute("city_not_found", true);
         }
-
-        return "redirect:/api/city/";
-
+        return "redirect:/api/city/list";
     }
 
 }

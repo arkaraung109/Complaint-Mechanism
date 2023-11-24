@@ -11,20 +11,20 @@ import org.springframework.stereotype.Component;
 public class UniqueCompanyValidator implements ConstraintValidator<UniqueCompany, CompanyModel> {
 
     @Autowired
-    CompanyService companyService;
+    private CompanyService companyService;
 
     @Override
     public boolean isValid(CompanyModel companyModel, ConstraintValidatorContext constraintValidatorContext) {
-        String cityName = companyModel.getCityName();
-        String townshipName = companyModel.getTownshipName();
-        String industrialZoneName = companyModel.getIndustrialZoneName();
+        long cityId = companyModel.getCityId();
+        long townshipId = companyModel.getTownshipId();
+        long industrialZoneId = companyModel.getIndustrialZoneId();
         String companyName = companyModel.getName();
 
         constraintValidatorContext.disableDefaultConstraintViolation();
         constraintValidatorContext.buildConstraintViolationWithTemplate(constraintValidatorContext.getDefaultConstraintMessageTemplate())
                                   .addPropertyNode( "name" )
                                   .addConstraintViolation();
-        return !companyService.findExistsByCityNameAndTownshipNameAndIndustrialZoneName(cityName, townshipName, industrialZoneName, companyName);
+        return !companyService.findExistsByCityIdAndTownshipIdAndIndustrialZoneIdAndCompanyName(cityId, townshipId, industrialZoneId, companyName);
     }
 
 }

@@ -15,7 +15,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ComplaintForm {
+public class Complaint {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -68,7 +68,8 @@ public class ComplaintForm {
     @ManyToMany(fetch = FetchType.LAZY, cascade = {
             CascadeType.MERGE
     })
-    @JoinTable(name = "complaint_form_title", joinColumns = @JoinColumn(name = "complaint_form_id"), inverseJoinColumns = @JoinColumn(name = "complaint_title_id"))
+    @OrderBy("name asc")
+    @JoinTable(name = "complaint_has_complaint_title", joinColumns = @JoinColumn(name = "complaint_id"), inverseJoinColumns = @JoinColumn(name = "complaint_title_id"))
     @JsonManagedReference
     private Set<ComplaintTitle> complaintTitleSet = new HashSet<>();
 

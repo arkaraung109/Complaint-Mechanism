@@ -14,13 +14,12 @@ public interface CityRepository extends JpaRepository<City, Long> {
 
     boolean existsByName(String cityName);
 
-    City findByName(String cityName);
-
     @Query(value = "select distinct(name) from city order by name", nativeQuery = true)
     List<String> findAllDistinctNameByOrderByNameAsc();
 
-    Page<City> findAllByOrderByNameAsc(Pageable paging);
-
-    Page<City> findByNameStartingWithIgnoreCaseOrderByNameAsc(String cityName, Pageable paging);
+    @Query(value = "select * from city where name like ?1% order by name",
+            countQuery = "select * from city where name like ?1% order by name",
+            nativeQuery = true)
+    Page<City> findByPageWithKeyword(String keyword, Pageable paging);
 
 }

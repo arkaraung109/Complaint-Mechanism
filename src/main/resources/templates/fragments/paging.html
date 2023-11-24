@@ -5,37 +5,37 @@
 </head>
 <body>
     <a th:fragment="cityPaging(pageNum, label, tooltip)" class="page-link"
-       th:href="@{'/api/city/page?' + ${keyword!=null && keyword!='' ? 'keyword=' + keyword + '&' : ''} + 'page=' + ${pageNum} + '&size=' + ${pageSize}}"
+       th:href="@{'/api/city/list?' + ${keyword!=null && keyword!='' ? 'keyword=' + keyword + '&' : ''} + 'pageNum=' + ${pageNum} + '&pageSize=' + ${pageSize}}"
        th:title="${tooltip}" rel="tooltip">
         [[${label}]]
     </a>
 
     <a th:fragment="townshipPaging(pageNum, label, tooltip)" class="page-link"
-       th:href="@{'/api/township/page?' + ${cityName!=null && cityName!='' ? 'cityName=' + cityName + '&' : ''} + '' + ${keyword!=null && keyword!='' ? 'keyword=' + keyword + '&' : ''} + 'page=' + ${pageNum} + '&size=' + ${pageSize}}"
+       th:href="@{'/api/township/list?' + ${cityName!=null && cityName!='' ? 'cityName=' + cityName + '&' : ''} + '' + ${keyword!=null && keyword!='' ? 'keyword=' + keyword + '&' : ''} + 'pageNum=' + ${pageNum} + '&pageSize=' + ${pageSize}}"
        th:title="${tooltip}" rel="tooltip">
         [[${label}]]
     </a>
 
     <a th:fragment="industrialZonePaging(pageNum, label, tooltip)" class="page-link"
-       th:href="@{'/api/industrialZone/page?' + ${cityName!=null && cityName!='' ? 'cityName=' + cityName + '&' : ''} + '' + ${townshipName!=null && townshipName!='' ? 'townshipName=' + townshipName + '&' : ''} + '' + ${keyword!=null && keyword!='' ? 'keyword=' + keyword + '&' : ''} + 'page=' + ${pageNum} + '&size=' + ${pageSize}}"
+       th:href="@{'/api/industrialZone/list?' + ${cityName!=null && cityName!='' ? 'cityName=' + cityName + '&' : ''} + '' + ${townshipName!=null && townshipName!='' ? 'townshipName=' + townshipName + '&' : ''} + '' + ${keyword!=null && keyword!='' ? 'keyword=' + keyword + '&' : ''} + 'pageNum=' + ${pageNum} + '&pageSize=' + ${pageSize}}"
        th:title="${tooltip}" rel="tooltip">
         [[${label}]]
     </a>
 
     <a th:fragment="companyPaging(pageNum, label, tooltip)" class="page-link"
-       th:href="@{'/api/company/page?' + ${cityName!=null && cityName!='' ? 'cityName=' + cityName + '&' : ''} + '' + ${townshipName!=null && townshipName!='' ? 'townshipName=' + townshipName + '&' : ''} + '' + ${industrialZoneName!=null && industrialZoneName!='' ? 'industrialZoneName=' + industrialZoneName + '&' : ''} + '' + ${keyword!=null && keyword!='' ? 'keyword=' + keyword + '&' : ''} + 'page=' + ${pageNum} + '&size=' + ${pageSize}}"
+       th:href="@{'/api/company/list?' + ${cityName!=null && cityName!='' ? 'cityName=' + cityName + '&' : ''} + '' + ${townshipName!=null && townshipName!='' ? 'townshipName=' + townshipName + '&' : ''} + '' + ${industrialZoneName!=null && industrialZoneName!='' ? 'industrialZoneName=' + industrialZoneName + '&' : ''} + '' + ${keyword!=null && keyword!='' ? 'keyword=' + keyword + '&' : ''} + 'pageNum=' + ${pageNum} + '&pageSize=' + ${pageSize}}"
        th:title="${tooltip}" rel="tooltip">
         [[${label}]]
     </a>
 
     <a th:fragment="complaintTitlePaging(pageNum, label, tooltip)" class="page-link"
-       th:href="@{'/api/complaintTitle/page?' + ${keyword!=null && keyword!='' ? 'keyword=' + keyword + '&' : ''} + 'page=' + ${pageNum} + '&size=' + ${pageSize}}"
+       th:href="@{'/api/complaintTitle/list?' + ${keyword!=null && keyword!='' ? 'keyword=' + keyword + '&' : ''} + 'pageNum=' + ${pageNum} + '&pageSize=' + ${pageSize}}"
        th:title="${tooltip}" rel="tooltip">
         [[${label}]]
     </a>
 
     <a th:fragment="complaintPaging(pageNum, label, tooltip)" class="page-link"
-       th:href="@{'/api/complaint/page?' + ${date!=null && date!='' ? 'date=' + date + '&' : ''} + '' + ${companyName!=null && companyName!='' ? 'companyName=' + companyName + '&' : ''} + '' + ${complaintTitleName!=null && complaintTitleName!='' ? 'complaintTitleName=' + complaintTitleName + '&' : ''} + 'page=' + ${pageNum} + '&size=' + ${pageSize}}"
+       th:href="@{'/api/complaint/list?' + ${complaintTitleName!=null && complaintTitleName!='' ? 'complaintTitleName=' + complaintTitleName + '&' : ''} + '' + ${date!=null && date!='' ? 'date=' + date + '&' : ''} + '' + ${keyword!=null && keyword!='' ? 'keyword=' + keyword + '&' : ''} + 'pageNum=' + ${pageNum} + '&pageSize=' + ${pageSize}}"
        th:title="${tooltip}" rel="tooltip">
         [[${label}]]
     </a>
@@ -51,7 +51,7 @@
             <li class="page-item disabled" th:if="${currentPage - 2 > 1}">
                 <a class="page-link" href="#">...</a>
             </li>
-            <li class="page-item" th:classappend="${page == currentPage} ? 'active'"
+            <li class="page-item" th:classappend="${pageNum == currentPage} ? 'active'"
                 th:each="page : ${#numbers.sequence(currentPage > 2 ? currentPage - 2 : 1, currentPage + 2 < totalPages ? currentPage + 2 : totalPages)}">
                 <a th:replace="~{fragments/paging :: cityPaging(${page}, ${page}, 'Page ' + ${page})}"></a>
             </li>
@@ -78,7 +78,7 @@
             <li class="page-item disabled" th:if="${currentPage - 2 > 1}">
                 <a class="page-link" href="#">...</a>
             </li>
-            <li class="page-item" th:classappend="${page == currentPage} ? 'active'"
+            <li class="page-item" th:classappend="${pageNum == currentPage} ? 'active'"
                 th:each="page : ${#numbers.sequence(currentPage > 2 ? currentPage - 2 : 1, currentPage + 2 < totalPages ? currentPage + 2 : totalPages)}">
                 <a th:replace="~{fragments/paging :: townshipPaging(${page}, ${page}, 'Page ' + ${page})}"></a>
             </li>
@@ -105,7 +105,7 @@
             <li class="page-item disabled" th:if="${currentPage - 2 > 1}">
                 <a class="page-link" href="#">...</a>
             </li>
-            <li class="page-item" th:classappend="${page == currentPage} ? 'active'"
+            <li class="page-item" th:classappend="${pageNum == currentPage} ? 'active'"
                 th:each="page : ${#numbers.sequence(currentPage > 2 ? currentPage - 2 : 1, currentPage + 2 < totalPages ? currentPage + 2 : totalPages)}">
                 <a th:replace="~{fragments/paging :: industrialZonePaging(${page}, ${page}, 'Page ' + ${page})}"></a>
             </li>
@@ -132,7 +132,7 @@
             <li class="page-item disabled" th:if="${currentPage - 2 > 1}">
                 <a class="page-link" href="#">...</a>
             </li>
-            <li class="page-item" th:classappend="${page == currentPage} ? 'active'"
+            <li class="page-item" th:classappend="${pageNum == currentPage} ? 'active'"
                 th:each="page : ${#numbers.sequence(currentPage > 2 ? currentPage - 2 : 1, currentPage + 2 < totalPages ? currentPage + 2 : totalPages)}">
                 <a th:replace="~{fragments/paging :: companyPaging(${page}, ${page}, 'Page ' + ${page})}"></a>
             </li>
@@ -159,7 +159,7 @@
             <li class="page-item disabled" th:if="${currentPage - 2 > 1}">
                 <a class="page-link" href="#">...</a>
             </li>
-            <li class="page-item" th:classappend="${page == currentPage} ? 'active'"
+            <li class="page-item" th:classappend="${pageNum == currentPage} ? 'active'"
                 th:each="page : ${#numbers.sequence(currentPage > 2 ? currentPage - 2 : 1, currentPage + 2 < totalPages ? currentPage + 2 : totalPages)}">
                 <a th:replace="~{fragments/paging :: complaintTitlePaging(${page}, ${page}, 'Page ' + ${page})}"></a>
             </li>
@@ -186,7 +186,7 @@
             <li class="page-item disabled" th:if="${currentPage - 2 > 1}">
                 <a class="page-link" href="#">...</a>
             </li>
-            <li class="page-item" th:classappend="${page == currentPage} ? 'active'"
+            <li class="page-item" th:classappend="${pageNum == currentPage} ? 'active'"
                 th:each="page : ${#numbers.sequence(currentPage > 2 ? currentPage - 2 : 1, currentPage + 2 < totalPages ? currentPage + 2 : totalPages)}">
                 <a th:replace="~{fragments/paging :: complaintPaging(${page}, ${page}, 'Page ' + ${page})}"></a>
             </li>
