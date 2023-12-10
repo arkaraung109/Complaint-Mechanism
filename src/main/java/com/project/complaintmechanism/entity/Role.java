@@ -12,12 +12,15 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(name = "role")
 public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private long id;
 
+    @Column(name = "name")
     private String name;
 
     @OneToMany(mappedBy = "role")

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Profile</title>
+    <div th:replace="~{fragments/include :: include}"></div>
+    <script th:src="@{/js/main.js}"></script>
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+<main id="main" class="main">
+    <div class="pagetitle">
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a th:href="@{/dashboard}"><i class="fa-solid fa-house"></i><span class="ms-1">Welcome</span></a>
+                </li>
+                <li class="breadcrumb-item"><a th:href="@{/profile}">Profile</a></li>
+            </ol>
+        </nav>
+    </div>
+    <section class="section">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Profile Information</h5>
+                <form th:object="${profileModel}" th:action="@{/profile}" id="submitForm" method="POST">
+                    <div class="row mb-4">
+                        <div class="col-4"></div>
+                        <div class="col-4">
+                            <input type="hidden" th:value="*{id}" th:field="*{id}">
+                            <label for="name" class="form-label">Name<span class="text-danger"> *</span></label>
+                            <input type="text" class="form-control" id="name" th:value="*{name}" th:field="*{name}">
+                            <span class="form-text text-danger" th:if="${#fields.hasErrors('name')}"
+                                  th:errors="*{name}"></span>
+                        </div>
+                        <div class="col-4"></div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-4"></div>
+                        <div class="col-4">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" th:value="*{username}" disabled>
+                            <input type="text" class="form-control" th:value="*{username}" th:field="*{username}" hidden>
+                        </div>
+                        <div class="col-4"></div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-4"></div>
+                        <div class="col-4">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="text" class="form-control" id="email" th:value="*{email}" th:field="*{email}">
+                            <span class="form-text text-danger" th:if="${#fields.hasErrors('email')}"
+                                  th:errors="*{email}"></span>
+                        </div>
+                        <div class="col-4"></div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-4"></div>
+                        <div class="col-4">
+                            <label for="phone" class="form-label">Phone</label>
+                            <input type="text" class="form-control" id="phone" th:value="*{phone}" th:field="*{phone}">
+                            <span class="form-text text-danger" th:if="${#fields.hasErrors('phone')}"
+                                  th:errors="*{phone}"></span>
+                        </div>
+                        <div class="col-4"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4"></div>
+                        <div class="col-4">
+                            <div class="d-grid gap-2 d-flex justify-content-end">
+                                <button type="submit" class="btn btn-update" style="background:#49b7bf; color:white;">Update
+                                </button>
+                                <a th:href="@{/profile}" class="btn"
+                                   style="background:#f56e70; color:white;">Reset</a>
+                                <a th:href="@{/dashboard}" class="btn" style="background:orange; color:white;">Back</a>
+                            </div>
+                        </div>
+                        <div class="col-4"></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+</main>
+<script th:inline="javascript">
+    $(document).ready(function() {
+
+    <!-- When update button is clicked -->
+        $(".btn-update").click(function(event) {
+            event.preventDefault();
+            $.confirm({
+                title: 'Prompt!',
+                content: '' +
+                '<form action="" id="form" class="">' +
+                '<div class="">' +
+                '<label for="password">Please enter password</label>' +
+                '<input type="text" class="form-control" id="password" required />' +
+                '</div>' +
+                '</form>',
+                buttons: {
+                    formSubmit: {
+                        text: 'Submit',
+                        btnClass: 'btn-blue',
+                        action: function() {
+                            var password = this.$content.find('#password').val();
+                            $.ajax({
+                                url: "/profile/checkPassword",
+                                type: "POST",
+                                data: {
+                                    "password" : password
+                                },
+                                success: function(data) {
+                                    if(data) {
+                                        $("#submitForm").submit();
+                                    } else {
+                                        $.alert('Wrong Password!');
+                                    }
+                                }
+                            });
+                        }
+                    },
+                    cancel: function () {
+                        //close
+                    },
+                },
+                onContentReady: function () {
+                    // bind to events
+                    var jc = this;
+                    this.$content.find('#form').on('submit', function (e) {
+                        // if the user submits the form by pressing enter in the field.
+                        e.preventDefault();
+                        jc.$$formSubmit.trigger('click'); // reference the button and click it
+                    });
+                }
+            });
+        });
+    <!-- End -->
+
+    });
+</script>
+</body>
+</html>

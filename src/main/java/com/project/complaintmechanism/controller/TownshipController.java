@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -29,12 +30,14 @@ public class TownshipController {
     private TownshipService townshipService;
 
     @PostMapping("/cityId")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseBody
     public List<Township> findByCityId(@RequestParam("cityId") long cityId) {
         return townshipService.findByCityId(cityId);
     }
 
     @GetMapping("/list")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String navigateToListPage(@RequestParam(defaultValue = "") String cityName, @RequestParam(defaultValue = "") String keyword, @RequestParam(defaultValue = "1") int pageNum, @RequestParam(defaultValue = "5") int pageSize, Model model, HttpSession httpSession) {
         Page<Township> townshipPage = townshipService.findByPage(cityName, keyword, pageNum, pageSize);
         List<Township> townshipList = townshipPage.getContent();
@@ -57,6 +60,7 @@ public class TownshipController {
     }
 
     @GetMapping("/add")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String navigateToAddPage(Model model) {
         List<City> cityList = cityService.findAll();
         model.addAttribute("cityList", cityList);
@@ -65,6 +69,7 @@ public class TownshipController {
     }
 
     @PostMapping("/add")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String add(@Valid @ModelAttribute("township") TownshipModel townshipModel, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
         if (!result.hasErrors()) {
             townshipService.save(townshipModel);
@@ -79,6 +84,7 @@ public class TownshipController {
     }
 
     @GetMapping("/edit/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String navigateToEditPage(@PathVariable("id") long id, Model model, RedirectAttributes redirectAttributes) {
         Township township = townshipService.findById(id);
 
@@ -99,6 +105,7 @@ public class TownshipController {
     }
 
     @PostMapping("/edit")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String update(@Valid @ModelAttribute("township") TownshipModel townshipModel, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
         if (!result.hasErrors()) {
             townshipService.update(townshipModel);
@@ -113,6 +120,7 @@ public class TownshipController {
     }
 
     @GetMapping("/delete/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String delete(@PathVariable("id") long id, RedirectAttributes redirectAttributes) {
         Township township = townshipService.findById(id);
 

@@ -145,6 +145,24 @@
             $("#sidebar-nav").children("li:nth-child(1)").children("a").removeClass("collapsed");
         <!-- End -->
 
+        <!-- Alert Boxes -->
+            if([[${updated_success}]]) {
+                iziToast.success({
+                    color: 'blue',
+                    title: 'Done',
+                    message: 'Successfully Updated!',
+                    position: 'topCenter'
+                });
+            }
+            if([[${change_password_success}]]) {
+                iziToast.success({
+                    color: 'blue',
+                    title: 'Done',
+                    message: 'Successfully Changed Password!',
+                    position: 'topCenter'
+                });
+            }
+        <!-- End -->
         });
 
     </script>

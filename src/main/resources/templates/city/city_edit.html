@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>City Update Form</title>
+    <title>City Edit Form</title>
     <div th:replace="~{fragments/include :: include}"></div>
     <script th:src="@{/js/main.js}"></script>
 </head>
@@ -13,7 +13,7 @@
         <nav>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item">
-                    <a th:href="@{/}"><i class="fa-solid fa-house"></i><span class="ms-1">Welcome</span></a>
+                    <a th:href="@{/dashboard}"><i class="fa-solid fa-house"></i><span class="ms-1">Welcome</span></a>
                 </li>
                 <li class="breadcrumb-item"><a th:href="@{/api/city/list}">City</a></li>
                 <li class="breadcrumb-item"><a th:href="@{'/api/city/edit/' + ${city.id}}">Edit</a></li>

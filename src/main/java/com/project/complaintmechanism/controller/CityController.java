@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -25,6 +26,7 @@ public class CityController {
     private CityService cityService;
 
     @GetMapping("/list")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String navigateToListPage(Model model, @RequestParam(defaultValue = "") String keyword, @RequestParam(defaultValue = "1") int pageNum, @RequestParam(defaultValue = "5") int pageSize, HttpSession httpSession) {
         Page<City> cityPage = cityService.findByPage(keyword, pageNum, pageSize);
         List<City> cityList = cityPage.getContent();
@@ -43,12 +45,14 @@ public class CityController {
     }
 
     @GetMapping("/add")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String navigateToAddPage(Model model) {
         model.addAttribute("city", new CityModel());
         return "city/city_add";
     }
 
     @PostMapping("/add")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String add(@Valid @ModelAttribute("city") CityModel cityModel, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
         if (!result.hasErrors()) {
             cityService.save(cityModel);
@@ -60,6 +64,7 @@ public class CityController {
     }
 
     @GetMapping("/edit/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String navigateToEditPage(@PathVariable("id") long id, Model model, RedirectAttributes redirectAttributes) {
         City city = cityService.findById(id);
 
@@ -77,6 +82,7 @@ public class CityController {
     }
 
     @PostMapping("/edit")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String update(@Valid @ModelAttribute("city") CityModel cityModel, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
         if (!result.hasErrors()) {
             cityService.update(cityModel);
@@ -89,6 +95,7 @@ public class CityController {
     }
 
     @GetMapping("/delete/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String delete(@PathVariable("id") long id, RedirectAttributes redirectAttributes) {
         City city = cityService.findById(id);
 

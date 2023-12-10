@@ -13,7 +13,7 @@
         <nav>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item">
-                    <a th:href="@{/}"><i class="fa-solid fa-house"></i><span class="ms-1">Welcome</span></a>
+                    <a th:href="@{/dashboard}"><i class="fa-solid fa-house"></i><span class="ms-1">Welcome</span></a>
                 </li>
                 <li class="breadcrumb-item"><a th:href="@{/api/company/list}">Company</a></li>
             </ol>
@@ -153,15 +153,6 @@
                 color: 'blue',
                 title: 'Done',
                 message: 'Successfully Updated!',
-                position: 'topCenter'
-            });
-        }
-
-        if([[${deleted_success}]]) {
-            iziToast.success({
-                color: 'red',
-                title: 'Done',
-                message: 'Successfully Deleted!',
                 position: 'topCenter'
             });
         }

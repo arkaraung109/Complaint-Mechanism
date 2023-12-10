@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -33,12 +34,14 @@ public class IndustrialZoneController {
     private IndustrialZoneService industrialZoneService;
 
     @PostMapping("/townshipId")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseBody
     public List<IndustrialZone> findByTownshipId(@RequestParam("townshipId") long townshipId) {
         return industrialZoneService.findByTownshipId(townshipId);
     }
 
     @GetMapping("/list")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String navigateToListPage(@RequestParam(defaultValue = "") String cityName, @RequestParam(defaultValue = "") String townshipName, @RequestParam(defaultValue = "") String keyword, @RequestParam(defaultValue = "1") int pageNum, @RequestParam(defaultValue = "5") int pageSize, Model model, HttpSession httpSession) {
         Page<IndustrialZone> industrialZonePage = industrialZoneService.findByPage(cityName, townshipName, keyword, pageNum, pageSize);
         List<IndustrialZone> industrialZoneList = industrialZonePage.getContent();
@@ -65,6 +68,7 @@ public class IndustrialZoneController {
     }
 
     @GetMapping("/add")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String navigateToAddPage(Model model) {
         List<City> cityList = cityService.findAll();
         model.addAttribute("cityList", cityList);
@@ -73,6 +77,7 @@ public class IndustrialZoneController {
     }
 
     @PostMapping("/add")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String add(@Valid @ModelAttribute("industrialZone") IndustrialZoneModel industrialZoneModel, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
         if (!result.hasErrors()) {
             industrialZoneService.save(industrialZoneModel);
@@ -89,6 +94,7 @@ public class IndustrialZoneController {
     }
 
     @GetMapping("/edit/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String navigateToEditPage(@PathVariable("id") long id, Model model, RedirectAttributes redirectAttributes) {
         IndustrialZone industrialZone = industrialZoneService.findById(id);
 
@@ -112,6 +118,7 @@ public class IndustrialZoneController {
     }
 
     @PostMapping("/edit")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String update(@Valid @ModelAttribute("industrialZone") IndustrialZoneModel industrialZoneModel, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
         if (!result.hasErrors()) {
             industrialZoneService.update(industrialZoneModel);
@@ -128,6 +135,7 @@ public class IndustrialZoneController {
     }
 
     @GetMapping("/delete/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String delete(@PathVariable("id") long id, RedirectAttributes redirectAttributes) {
         IndustrialZone industrialZone = industrialZoneService.findById(id);
 

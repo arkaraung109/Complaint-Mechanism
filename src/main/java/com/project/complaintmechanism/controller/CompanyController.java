@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -36,12 +37,14 @@ public class CompanyController {
     private CompanyService companyService;
 
     @PostMapping("/industrialZoneId")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseBody
     public List<Company> findByIndustrialZoneId(@RequestParam("industrialZoneId") long industrialZoneId) {
         return companyService.findByIndustrialZoneId(industrialZoneId);
     }
 
     @GetMapping("/list")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String navigateToListPage(@RequestParam(defaultValue = "") String cityName, @RequestParam(defaultValue = "") String townshipName, @RequestParam(defaultValue = "") String industrialZoneName, @RequestParam(defaultValue = "") String keyword, @RequestParam(defaultValue = "1") int pageNum, @RequestParam(defaultValue = "5") int pageSize, Model model, HttpSession httpSession) {
         Page<Company> companyPage = companyService.findByPage(cityName, townshipName, industrialZoneName, keyword, pageNum, pageSize);
         List<Company> companyList = companyPage.getContent();
@@ -72,6 +75,7 @@ public class CompanyController {
     }
 
     @GetMapping("/add")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String navigateToAddPage(Model model) {
         List<City> cityList = cityService.findAll();
         model.addAttribute("cityList", cityList);
@@ -80,6 +84,7 @@ public class CompanyController {
     }
 
     @PostMapping("/add")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String add(@Valid @ModelAttribute("company") CompanyModel companyModel, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
         if (!result.hasErrors()) {
             companyService.save(companyModel);
@@ -98,6 +103,7 @@ public class CompanyController {
     }
 
     @GetMapping("/edit/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String navigateToEditPage(@PathVariable("id") long id, Model model, RedirectAttributes redirectAttributes) {
         Company company = companyService.findById(id);
 
@@ -125,6 +131,7 @@ public class CompanyController {
     }
 
     @PostMapping("/edit")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String update(@Valid @ModelAttribute("company") CompanyModel companyModel, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
         if (!result.hasErrors()) {
             companyService.update(companyModel);
@@ -143,6 +150,7 @@ public class CompanyController {
     }
 
     @GetMapping("/status/{status}/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String changeStatus(@PathVariable("status") boolean status, @PathVariable("id") long id, RedirectAttributes redirectAttributes) {
         Company company = companyService.findById(id);
 

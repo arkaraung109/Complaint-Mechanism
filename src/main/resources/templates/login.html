@@ -16,22 +16,30 @@
                             <div class="card-body">
                                 <div class="pt-4 pb-2">
                                     <h5 class="card-title text-center pb-0 fs-4">Login to Your Account</h5>
+                                    <h6 class="text-center text-danger pb-0 fs-4" th:if="${param.error}">Username or password is wrong.</h6>
+                                    <h6 class="text-center text-success pb-0 fs-4" th:if="${param.logout}">You have been logged out.</h6>
+                                    <h6 class="text-center text-success pb-0 fs-4" th:if="${param.verified_success}">Account is Verified. You can log in now.</h6>
+                                    <h6 class="text-center text-danger pb-0 fs-4" th:if="${param.verified_failure}">The account may be already verified or verification is invalid!</h6>
+                                    <h6 class="text-center text-success pb-0 fs-4" th:if="${param.forgot_password_success}">Password reset email has been sent! Please check email!</h6>
                                 </div>
                                 <form method="POST" th:action="@{/login}" th:object="${user}" class="row g-3">
                                     <div class="col-12">
                                         <label for="username" class="form-label">Username</label>
                                         <div class="input-group">
                                             <span class="input-group-text" id="inputGroupPrepend">@</span>
-                                            <input type="text" name="username" class="form-control" id="username" th:field="*{username}" required>
+                                            <input type="text" name="username" class="form-control" id="username" th:field="*{username}">
                                             <span class="form-text text-danger" th:if="${#fields.hasErrors('username')}"
                                                   th:errors="*{username}"></span>
                                         </div>
                                     </div>
                                     <div class="col-12">
                                         <label for="password" class="form-label">Password</label>
-                                        <input type="password" name="password" class="form-control" id="password" th:field="*{password}" required>
+                                        <input type="password" name="password" class="form-control" id="password" th:field="*{password}">
                                         <span class="form-text text-danger" th:if="${#fields.hasErrors('password')}"
                                               th:errors="*{password}"></span>
+                                    </div>
+                                    <div class="col-12">
+                                        <a th:href="@{/forgotPassword}">Forgot Password?</a>
                                     </div>
                                     <div class="col-12">
                                         <button class="btn btn-primary w-100" type="submit">Login</button>

@@ -6,6 +6,7 @@ import com.project.complaintmechanism.service.DailyLimitService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -23,6 +24,7 @@ public class DailyLimitController {
     private DailyLimitService dailyLimitService;
 
     @PostMapping("/edit")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String update(@Valid @ModelAttribute("dailyLimit") DailyLimitModel dailyLimitModel, BindingResult result, HttpSession httpSession, RedirectAttributes redirectAttributes) {
         Object object = httpSession.getAttribute("complaintStatus");
         String complaintStatus;

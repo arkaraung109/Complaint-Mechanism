@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 <head>
     <meta charset="UTF-8">
 </head>
@@ -7,7 +7,7 @@
     <div th:fragment="header">
         <header id="header" class="header fixed-top d-flex align-items-center">
             <div class="d-flex align-items-center justify-content-between">
-                <a th:href="@{/}" class="logo d-flex align-items-center">
+                <a th:href="@{/dashboard}" class="logo d-flex align-items-center">
                     <img th:src="@{/img/icon1.png}" alt="">
                     <span class="d-none d-lg-block">VLCA</span>
                 </a>
@@ -21,11 +21,19 @@
                         </a>
                         <ul	class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                             <li class="dropdown-header">
-                                <h6>Admin</h6>
+<!--                                <h6 th:text="${#authentication.principal.username}"></h6>-->
+                                <h6 sec:authentication="name"></h6>
+                                <h6 sec:authentication="principal.authorities"></h6>
                             </li>
                             <li>
-                                <a class="dropdown-item d-flex align-items-center" href="">
+                                <a class="dropdown-item d-flex align-items-center" th:href="@{/profile}">
                                     <i class="fa-solid fa-user"></i>
+                                    <span class="ms-2">Profile</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center" th:href="@{/profile/changePassword}">
+                                    <i class="fa-solid fa-key"></i>
                                     <span class="ms-2">Change Password</span>
                                 </a>
                             </li>
@@ -46,12 +54,12 @@
         <aside id="sidebar" class="sidebar">
             <ul class="sidebar-nav" id="sidebar-nav">
                 <li class="nav-item">
-                    <a class="nav-link collapsed" th:href="@{/}">
+                    <a class="nav-link collapsed" th:href="@{/dashboard}">
                         <i class="bi bi-grid mb-1"></i>
                         <span>Dashboard</span>
                     </a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" sec:authorize="hasAuthority('ADMIN')">
                     <a class="nav-link collapsed" data-bs-target="#settings-nav" data-bs-toggle="collapse" href="#">
                         <i class="bi bi-gear mb-1"></i>
                         <span>General Settings</span>
@@ -63,9 +71,10 @@
                         <li><a th:href="@{/api/industrialZone/list}"><i class="bi bi-circle mt-1"></i><span>Industrial Zone</span></a></li>
                         <li><a th:href="@{/api/company/list}"><i class="bi bi-circle mt-1"></i><span>Company</span></a></li>
                         <li><a th:href="@{/api/complaintTitle/list}"><i class="bi bi-circle mt-1"></i><span>Complaint Title</span></a></li>
+                        <li><a th:href="@{/api/staff/list}"><i class="bi bi-circle mt-1"></i><span>Staff</span></a></li>
                     </ul>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" sec:authorize="hasAnyAuthority('ADMIN', 'STAFF')">
                     <a class="nav-link collapsed" data-bs-target="#status-nav" data-bs-toggle="collapse" href="#">
                         <i class="bi bi-layout-text-window-reverse mb-1"></i>
                         <span>Complaint List</span>

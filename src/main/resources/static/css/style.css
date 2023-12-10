@@ -1282,7 +1282,7 @@ h6 {
   font-size: 15px;
 }
 
-.table .btn-edit {
+.table .btn-edit, .table .btn-reset-password {
   background: #49b7bf;
   color: white;
 }

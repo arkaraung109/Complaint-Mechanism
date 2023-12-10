@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -26,6 +27,7 @@ public class ComplaintTitleController {
     private ComplaintTitleService complaintTitleService;
 
     @GetMapping("/list")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String navigateToListPage(@RequestParam(defaultValue = "") String keyword, @RequestParam(defaultValue = "1") int pageNum, @RequestParam(defaultValue = "5") int pageSize, Model model, HttpSession httpSession) {
         Page<ComplaintTitle> complaintTitlePage = complaintTitleService.findByPage(keyword, pageNum, pageSize);
         List<ComplaintTitle> complaintTitleList = complaintTitlePage.getContent();
@@ -44,12 +46,14 @@ public class ComplaintTitleController {
     }
 
     @GetMapping("/add")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String navigateToAddPage(Model model) {
         model.addAttribute("complaintTitle", new ComplaintTitleModel());
         return "complaint_title/complaint_title_add";
     }
 
     @PostMapping("/add")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String add(@Valid @ModelAttribute("complaintTitle") ComplaintTitleModel complaintTitleModel, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
         if (!result.hasErrors()) {
             complaintTitleService.save(complaintTitleModel);
@@ -61,6 +65,7 @@ public class ComplaintTitleController {
     }
 
     @GetMapping("/edit/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String navigateToEditPage(@PathVariable("id") long id, Model model, RedirectAttributes redirectAttributes) {
         ComplaintTitle complaintTitle = complaintTitleService.findById(id);
 
@@ -78,6 +83,7 @@ public class ComplaintTitleController {
     }
 
     @PostMapping("/edit")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String update(@Valid @ModelAttribute("complaintTitle") ComplaintTitleModel complaintTitleModel, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
         if (!result.hasErrors()) {
             complaintTitleService.update(complaintTitleModel);
@@ -90,6 +96,7 @@ public class ComplaintTitleController {
     }
 
     @GetMapping("/delete/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public String delete(@PathVariable("id") long id, RedirectAttributes redirectAttributes) {
         ComplaintTitle complaintTitle = complaintTitleService.findById(id);
 

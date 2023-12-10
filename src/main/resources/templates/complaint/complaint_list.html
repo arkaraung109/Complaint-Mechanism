@@ -12,7 +12,7 @@
     <div class="pagetitle">
         <nav>
             <ol class="breadcrumb" id="breadcrumb">
-                <li class="breadcrumb-item"><a th:href="@{/}"><i class="fa-solid fa-house"></i><span class="ms-1">Welcome</span></a>
+                <li class="breadcrumb-item"><a th:href="@{/dashboard}"><i class="fa-solid fa-house"></i><span class="ms-1">Welcome</span></a>
                 </li>
                 <li class="breadcrumb-item"><a th:href="@{/api/complaint/list/all}">Complaint</a></li>
                 <li class="breadcrumb-item"><a th:href="@{'/api/complaint/list/' + ${#ctx.session.complaintStatus.toLowerCase()}}">[[${#ctx.session.complaintStatus}]]</a></li>

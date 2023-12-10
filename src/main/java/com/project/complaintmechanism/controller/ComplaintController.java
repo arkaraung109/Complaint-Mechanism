@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -45,6 +46,7 @@ public class ComplaintController {
     private DailyLimitService dailyLimitService;
 
     @GetMapping("/list/{status}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
     public String navigateToListPage(@PathVariable("status") String status, @RequestParam(defaultValue = "") String complaintTitleName, @RequestParam(defaultValue = "") String date, @RequestParam(defaultValue = "") String keyword, @RequestParam(defaultValue = "1") int pageNum, @RequestParam(defaultValue = "5") int pageSize, Model model, HttpSession httpSession) {
         if(Objects.equals(status, "all")) {
             httpSession.setAttribute("complaintStatus", "All");
@@ -165,6 +167,7 @@ public class ComplaintController {
     }
 
     @PostMapping("/edit")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
     public String update(@Valid @ModelAttribute("complaintDetails") ComplaintDetailsModel complaintDetailsModel, BindingResult result, Model model, RedirectAttributes redirectAttributes, HttpSession httpSession) throws IOException {
         if(httpSession.getAttribute("complaintStatus") == null) {
             httpSession.setAttribute("complaintStatus", "All");
@@ -203,6 +206,7 @@ public class ComplaintController {
     }
 
     @PostMapping("/changeReadStatus")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
     @ResponseBody
     public void changeReadStatus(@RequestParam("idList[]") long[] idList, @RequestParam("status") boolean status) {
         for(long id : idList) {
@@ -211,6 +215,7 @@ public class ComplaintController {
     }
 
     @PostMapping("/changeTempDeletedStatus")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
     @ResponseBody
     public void changeTempDeletedStatus(@RequestParam("idList[]") long[] idList, @RequestParam("status") boolean status) {
         for(long id: idList) {
@@ -219,12 +224,14 @@ public class ComplaintController {
     }
 
     @PostMapping("/emptyTrash")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
     @ResponseBody
     public void emptyTrash() {
         complaintService.emptyTrash();
     }
 
     @GetMapping("/details/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
     public String navigateToDetailPage(@PathVariable("id") long id, Model model, RedirectAttributes redirectAttributes, HttpSession httpSession) {
         if(httpSession.getAttribute("complaintStatus") == null) {
             httpSession.setAttribute("complaintStatus", "All");
@@ -258,6 +265,7 @@ public class ComplaintController {
     }
 
     @RequestMapping("/display/{image}/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
     public void displayIdCardFront(@PathVariable("image") String image, @PathVariable("id")int id, HttpServletResponse response) throws IOException {
         Complaint complaint = complaintService.findById(id);
         response.setContentType("image/jpeg");
